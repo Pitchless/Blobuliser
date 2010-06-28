@@ -1,5 +1,6 @@
 import hypermedia.video.*;
 import java.awt.*;
+import processing.video.*; 
 
 
 OpenCV opencv;
@@ -25,11 +26,17 @@ color fgcol = color(255, 255, 0);
 
 PGraphics artLayer;
 
+Layer[] layers;
+
+
 void setup() {
     size( w, h );
 
+String[] devices = Capture.list();
+println(devices);
+
     opencv = new OpenCV( this );
-    opencv.capture(width,height);
+    opencv.capture(width,height,2);
     
     font = loadFont( "AndaleMono.vlw" );
     textFont( font );
@@ -41,24 +48,41 @@ void setup() {
     smooth();
     
     artLayer = createGraphics( width, height, P3D );
+    
+    //Layer layer1 = new NextManLines();
+    
+    layers = new Layer[6];
+    layers[0] = new BlobTracker();
+    layers[4] = new Squares();
+    layers[1] = new NextManLines();
+    layers[2] = new BigRaver();
+    layers[3] = new BigRaver(true);
+    layers[5] = new CatsCradle();
+
+    println("Setting up layers");
+    for ( int i=0; i<layers.length; i++ ) {
+      layers[i].setup();
+    }
+    println("Setup " + layers.length + " layers");
 }
 
 
 
 void draw() {
-
+    
     //background(0);
     opencv.read();
     //opencv.invert();
     opencv.absDiff();               //  Calculates the absolute difference
-    opencv.remember(); // diff image for next frame, track movement
+    opencv.remember();             // diff image for next frame, track movement
+    
     opencv.flip( OpenCV.FLIP_HORIZONTAL );
-
     opencv.convert( OpenCV.GRAY );  //  Converts the difference image to greyscale
     opencv.blur( OpenCV.BLUR, 3 );  //  I like to blur before taking the difference image to reduce camera noise
 
+    // The ghost users
     if (showImage) {
-      image( opencv.image(), 0, 0 );	            // RGB image
+      image( opencv.image(), 0, 0 );
     }
     else {
       background(0);
@@ -69,98 +93,25 @@ void draw() {
 
     //Blob[] blobs = opencv.blobs( 100, width*height/3, 20, true );
     Blob[] blobs = opencv.blobs( minBlobSize, width*height/3, numBlobs, detectHoles );
-    
-    if ( showBlobs ) drawCentroids(blobs);
-
-    if ( blurAmount > 0 ) artLayer.filter( BLUR, blurAmount );
-    artLayer.loadPixels();
-    for ( int i=0; i<artLayer.pixels.length; i++ ) {
-        // The functions red(), green(), and blue() pull out the 3 color components from a pixel.
-        float r = red(artLayer.pixels[i]);
-        float g = green(artLayer.pixels[i]);
-        float b = blue(artLayer.pixels[i]);
-        float a = alpha(artLayer.pixels[i]);
-        //colorMode( HSB, 1.0 );
-        artLayer.pixels[i] = color( r * fadeDown, g * fadeDown, b * fadeDown, a * fadeDown );
-        colorMode( RGB, 255 );
+ 
+    // Draw all visible layers   
+    for ( int i=0; i<layers.length; i++ ) {
+      if ( layers[i].visible ) {
+        layers[i].draw( blobs );
+      }
     }
-    artLayer.updatePixels();
-//    artLayer.tint(100);
-//    artLayer.background(0,0,0,0);
 
-    artLayer.beginDraw();
-    //artLayer.fill( 0 );
-    //artLayer.stroke( 0 );
-    //artLayer.rect( 0, 0, width, height );
-    //PImage artLayer.copy();
-    //artLayer.tintColor = color(255,0,0);
-    //artLayer.tint(255,128);
-    int len;
-    if ( blobs.length % 2 == 0 ) {
-      len = blobs.length;
-    }
-    else {
-      len = blobs.length - 1;
-    }
-    for( int i=0; i<len; i+=2 ) {
-       Point blob1 = blobs[i].centroid;
-       Point blob2 = blobs[i+1].centroid;
-       
-       artLayer.strokeWeight(3);
-       artLayer.stroke(fgcol, 160);
-       artLayer.line( blob1.x, blob1.y, blob2.x, blob2.y );
-       artLayer.strokeWeight(1);
-       artLayer.line( blob1.x, blob1.y, blob2.x, blob2.y );
-       artLayer.stroke(fgcol);
-       if (mirror) {
-           artLayer.line( blob1.x, blob1.y,  width - blob2.x, height - blob2.y );
-       }
-    }
-    artLayer.endDraw();
-    //opencv.convert( OpenCV.RGB );
-    //opencv.copy( artLayer );
-    //opencv.blur( OpenCV.BLUR, 4 );
-    //opencv.brightness( -20 );
-    //PImage oldLayer = opencv.image();
-    //image( oldLayer, 0, 0 );
-    //image( opencv.image(), 0, 0 );
-    //tint(255,128);
-    //artLayer.tint(255,20);
-    if (showArtLayer) image(artLayer, 0, 0);
-}
-
-void drawCentroids( Blob[] blobs ) {
-    for( int i=0; i<blobs.length; i++ ) {
-        Rectangle bounding_rect	= blobs[i].rectangle;
-        float area = blobs[i].area;
-        //float circumference = blobs[i].length;
-        Point centroid = blobs[i].centroid;
-
-        // Centroids        
-        stroke(0,0,255);
-        line( centroid.x-5, centroid.y, centroid.x+5, centroid.y );
-        line( centroid.x, centroid.y-5, centroid.x, centroid.y+5 );
-        noStroke();
-        fill(0,0,255);
-        text( area,centroid.x+5, centroid.y+5 );
-        
-        // rectangle and ellipse
-        noFill();
-        //stroke( blobs[i].isHole ? 128 : 64 );
-        stroke(0,255,0);
-        rect( bounding_rect.x, bounding_rect.y, bounding_rect.width, bounding_rect.height );
-        ellipse( centroid.x, centroid.y, 20, 20 );   
-    }
-}
-
-void mouseDragged() {
-    threshold = int( map(mouseX,0,width,0,255) );
-    println( "threshold:" + threshold );
+    if ( blurAmount > 0 ) filter( BLUR, blurAmount );
 }
 
 public void stop() {
     opencv.stop();
     super.stop();
+}
+
+void mouseDragged() {
+    threshold = int( map(mouseX,0,width,0,255) );
+    println( "threshold:" + threshold );
 }
 
 void mousePressed() {
@@ -186,12 +137,21 @@ void keyPressed() {
   else if (key == 's') {
     saveFrame();
   }
-  else if (key == 'p') {
-    showBlobs = showBlobs ? false : true;
-    background(0);
-  }
-  else if (key == 'i') {
+  else if (key == '1' ) {
     showImage = showImage ? false : true;
+  }
+  else if ( key > 49 && key < 61 ) { // keys '2' - '0'
+    int i = key;
+    i -= 49;
+    //i += 1;
+    println( "Toggle layer " + i );
+    if ( i > layers.length ) {
+      println("Layer " + i + " does not exist");
+    }
+    else {
+      layers[i-1].toggleVisible();
+      background(0);
+    }
   }
   else if (key == 'r') {
     opencv.remember();
@@ -199,10 +159,6 @@ void keyPressed() {
   else if (key == 'h') {
     detectHoles = detectHoles ? false : true;
     println( "detectHoles:" + detectHoles );
-  }
-  else if (key == 'a') {
-    showArtLayer = showArtLayer ? false : true;
-    println( "showArtLayer:" + showArtLayer );
   }
 }
 
