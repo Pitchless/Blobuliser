@@ -16,12 +16,6 @@ class Shapes extends Layer {
     this.drawShape = drawShape;
     this.scaleRatio = scaleRatio;
   }
-
-  Shapes( int drawShape, float scaleRatio, float rotation ) {
-    this.drawShape  = drawShape;
-    this.scaleRatio = scaleRatio;
-    this.rotation   = rotation;
-  }
   
   void setup() {
     super.setup();
@@ -44,15 +38,16 @@ class Shapes extends Layer {
       img.noFill();
       img.stroke( fgcol );
       img.strokeWeight(2);
-      img.translate( blob.x, blob.y );
-      img.rotate( radians(rotation) );
+      //img.translate( blob.x, blob.y );
+      //img.rotate( radians(rotation) );
       switch ( drawShape ) {
         case 1:
-          img.rect( 0, 0, size, size );
-          //img.rect( blob.x, blob.y, size, size );
+          //img.rect( 0, 0, size, size );
+          img.rect( blob.x, blob.y, size, size );
         break;
         case 2:
-          img.ellipse( 0, 0, size, size );
+          //img.ellipse( 0, 0, size, size );
+          img.ellipse( blob.x, blob.y, size, size );
         break;
       }
     }

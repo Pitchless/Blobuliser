@@ -5,6 +5,8 @@ class Shapes2 extends Layer {
   Float     fadePerFrame = 0.9998;
   float     scaleRatio   = 0.7;
   float     size         = 10;
+  int       weight       = 2;
+  boolean   flipFlop     = true;
 
   Shapes2() {}
   
@@ -24,11 +26,14 @@ class Shapes2 extends Layer {
  
   void show() {
     size = 5 + random(0,25);
+    img.background(0,0,0,0);
+    weight = (int)random(0,2) == 0 ? 1 : 2;
     super.show();
   }
   
   Boolean draw( Blob blobs[] ) {
-    fade( fadePerFrame );
+    if(flipFlop) fade( fadePerFrame );
+    flipFlop = flipFlop ? false : true;
     cycleColor();
 
     img.beginDraw();
@@ -41,8 +46,11 @@ class Shapes2 extends Layer {
       Point blob = blobs[i].centroid;
       //float size = blobs[i].area * scaleRatio;
       img.noFill();
-      img.stroke( fgcol );
-      img.strokeWeight(2);
+      colorMode(HSB);
+      color linecol = color( hue(fgcol), 255, 255, 200 );
+      colorMode(RGB);
+      img.stroke( linecol );
+      img.strokeWeight( weight );
       //img.translate( blob.x, blob.y );
       //img.rotate( radians(rotation) );
       switch ( drawShape ) {

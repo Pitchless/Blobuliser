@@ -64,21 +64,24 @@ void setup() {
     background(bgcol);
     smooth();
     frameRate(30);
-    
     int j = 0;
-    layers = new Layer[15];
+    layers = new Layer[19];
     layers[j++] = new BlobTracker();
-    layers[j++] = new Shapes2(1); // square
-    layers[j++] = new BigRaver(true, 0.986);
-    layers[j++] = new CatsCradle();
     layers[j++] = new Filler(1);
+    layers[j++] = new BigRaver(true, 0.986);
     layers[j++] = new Filler2(1);
     layers[j++] = new Filler2(2);
+    layers[j++] = new Shapes2(1,0.9999999); // square    
+    layers[j++] = new Shapes2(2,0.9999999); // circle    
+    layers[j++] = new Shapes2(1,0.998); // square
+    layers[j++] = new Shapes2(2,0.996); // circle
+    layers[j++] = new Shapes2(1,0.68); // square
+    layers[j++] = new Shapes2(2,0.72); // circle
     layers[j++] = new Shapes(1,0.9); // square
     layers[j++] = new Shapes(2,0.8); // circle
     layers[j++] = new Shapes(1,0.1); // square
     layers[j++] = new Shapes(2,0.2); // circle
-    layers[j++] = new Shapes(1,0.2,45); // square
+    layers[j++] = new CatsCradle();
     layers[j++] = new NextManLines();
     layers[j++] = new BigRaver();
     layers[j++] = new BigRaver(true);
