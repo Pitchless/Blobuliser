@@ -16,11 +16,14 @@ class BigRaver extends Layer {
   }
 
   void setup() {
+    super.setup();
     img = createGraphics( width, height, P3D );
   }
   
   Boolean draw( Blob blobs[] ) {
     fade( fadePerFrame );
+    cycleColor();
+
     if ( blobs.length > 0 ) {
       int len;
       if ( blobs.length % 2 == 0 ) {

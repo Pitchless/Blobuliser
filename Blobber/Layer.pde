@@ -3,23 +3,34 @@
  */
 class Layer {
   
-  Boolean visible = false; 
-  String  name = "";
+  Boolean   visible = false; 
+  String    name = "";
   PGraphics img;
+  color     fgcol = color(255,255,0);
+  int       hCycle;
   
   Layer() {
   }  
+ 
+  void show() {
+    visible = true;
+    setRandomColor();
+  }
+  
+  void hide() {
+    visible = false;
+  }
   
   void toggleVisible() {
-    visible = visible ? false : true;
+    if ( visible ) { hide(); } else { show(); }
   }
   
   void setup() {
     println( "Setup Layer: " + name );
+    setRandomColor();
   }
   
   Boolean draw( Blob[] blobs ) {
-    println( "Draw layer: " + name );
     return false; // We didn't render anything
   }
   
@@ -38,4 +49,18 @@ class Layer {
     img.updatePixels();
   }
   
+  void cycleColor() {
+    hCycle++;
+    if ( hCycle > 255) hCycle = 0;
+    colorMode(HSB);
+    fgcol = color( hCycle, saturation(fgcol), brightness(fgcol), alpha(fgcol) );
+    colorMode(RGB);
+  }
+  
+  void setRandomColor() {
+    colorMode(HSB);
+    hCycle = (int)random(0,255);
+    fgcol  = color( hCycle, 255, 255 );
+    colorMode(RGB);
+  }
 }

@@ -7,7 +7,7 @@ OpenCV opencv;
 
 int w = 640;
 int h = 480;
-boolean ps3cam = true;
+boolean ps3cam = false;
 int threshold = 40;
 int numBlobs = 16;
 boolean detectHoles = true;
@@ -17,10 +17,11 @@ float fadeDown = 0.8;   // Percent reduction per frame for ghost lines.
 float blurAmount = 0;
 boolean showBlobs = false;
 boolean showImage = true;
+int framesUntilChange = 30;
+int frameChangeCounter = 0;
 
 PFont font;
 
-boolean mirror = false;
 color bgcol = color(0);
 color fgcol = color(255, 255, 0);
 
@@ -46,28 +47,31 @@ void setup() {
     
     background(bgcol);
     smooth();
-        
-    layers = new Layer[7];
-    layers[0] = new BlobTracker();
-    layers[4] = new Squares();
-    layers[1] = new NextManLines();
-    layers[2] = new BigRaver();
-    layers[3] = new BigRaver(true);
-    layers[5] = new CatsCradle();
-    layers[6] = new Noizer();
+    frameRate(30);
+    
+    int j = 0;
+    layers = new Layer[8];
+    layers[j++] = new BlobTracker();
+    layers[j++] = new Shapes(1); // square
+    layers[j++] = new Shapes(2); // circle
+    layers[j++] = new NextManLines();
+    layers[j++] = new BigRaver();
+    layers[j++] = new BigRaver(true);
+    layers[j++] = new CatsCradle();
+    layers[j++] = new Noizer(); // must be last!
 
     println("Setting up layers");
     for ( int i=0; i<layers.length; i++ ) {
       layers[i].setup();
     }
     println("Setup " + layers.length + " layers");
+    toggleRandomLayer();
 
     if ( ps3cam ) {
       capture = new Capture( this, width, height, 30 );
       capture.settings();
     }
 }
-
 
 
 void draw() {
@@ -85,10 +89,13 @@ void draw() {
       opencv.read();
     }
     //opencv.flip( OpenCV.FLIP_HORIZONTAL );
-    PImage rememberImage = opencv.image(); // Will use after absDiff to set image for diff next frame
+    //PImage rememberImage = opencv.image(); // Will use after absDiff to set image for diff next frame
    
     //opencv.invert();
     opencv.absDiff();               // Calculates the absolute difference
+        opencv.remember();
+        opencv.flip( OpenCV.FLIP_HORIZONTAL );
+
     opencv.convert( OpenCV.GRAY );  // Converts the difference image to greyscale
     opencv.blur( OpenCV.BLUR, 3 );  // I like to blur before taking the difference image to reduce camera noise
 
@@ -106,6 +113,14 @@ void draw() {
     //Blob[] blobs = opencv.blobs( 100, width*height/3, 20, true );
     Blob[] blobs = opencv.blobs( minBlobSize, width*height/3, numBlobs, detectHoles );
  
+    frameChangeCounter++;
+    if ( frameChangeCounter >= framesUntilChange ) {
+      frameChangeCounter = 0;
+      framesUntilChange = 10 + floor(random(0,81));
+      //toggleRandomLayer();
+      setRandomLayers();  
+  }
+ 
     // Draw all visible layers   
     for ( int i=0; i<layers.length; i++ ) {
       if ( layers[i].visible ) {
@@ -116,15 +131,43 @@ void draw() {
     if ( blurAmount > 0 ) filter( BLUR, blurAmount );
 
     // Remember the image to use for the next absDiff
-    opencv.copy( rememberImage );
-    opencv.remember(1);
-
+    //opencv.copy( rememberImage );
+    //opencv.remember(1);
 }
 
 public void stop() {
     opencv.stop();
     super.stop();
 }
+
+void toggleLayer( int layerOn ) {
+  for ( int i=0; i<layers.length; i++ ) {
+    Layer layer = layers[i];
+    println("toggle layer:" + layerOn);
+    if ( i==layerOn ) { layer.show(); } else { layer.hide(); } 
+  }
+}
+
+int randomLayer() {
+    int layerOn = (int)random( 1, layers.length-1 );
+    return layerOn;
+}
+
+void toggleRandomLayer() {
+    toggleLayer( randomLayer() );
+}
+
+void setRandomLayers() {
+  for ( int i=0; i<layers.length; i++ ) {
+    layers[i].hide();
+  }
+  int numLayers = (int)random(1,3);
+  println("num layers" + numLayers);
+  for ( int i=0; i<numLayers; i++) {
+    layers[randomLayer()].show(); 
+  }  
+}
+
 
 void mouseDragged() {
     threshold = int( map(mouseX,0,width,0,255) );
@@ -136,10 +179,7 @@ void mousePressed() {
 }
 
 void keyPressed() {
-  if (key == 'm') {
-    mirror = !mirror;
-  }
-  else if (key == 'b') {
+  if (key == 'b') {
     blurAmount = blurAmount == 0 ? 1.0 : 0;
   }
   else if (key == 'F') {
@@ -176,5 +216,12 @@ void keyPressed() {
     detectHoles = detectHoles ? false : true;
     println( "detectHoles:" + detectHoles );
   }
+  else if (key == 'l') {
+    toggleRandomLayer();
+  }
+  else if (key == 'r') {
+    setRandomLayers();
+  }
+
 }
 
