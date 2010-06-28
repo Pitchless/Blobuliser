@@ -4,23 +4,25 @@ import processing.video.*;
 
 
 OpenCV opencv;
+OpenCV cv2;
 
 int w = 640;
 int h = 480;
 boolean ps3cam = true;
-int threshold = 40;
-int numBlobs = 16;
+int threshold = 80;
+int numBlobs = 14;
 boolean detectHoles = true;
 int minBlobSize = 10;
 float fadeDown = 0.8;   // Percent reduction per frame for ghost lines.
-// Blur the image 1 or 2. 0 disables. Slow!
-float blurAmount = 0;
+// Blur the image, should be odd int
+int blurAmount = 0;
 boolean showBlobs = false;
 boolean showImage = true;
 int framesUntilChange = 30;
 int frameChangeCounter = 0;
 int timeSinceBlob =0 , delayForSound=10;
 boolean interactif = false;
+boolean beRandom = true;
 
 PFont font;
 
@@ -31,7 +33,11 @@ Layer[] layers;
 Layer[] audioLayers;
 
 Capture capture;
+PImage captureImage; // Stash the image after capture
 BackgroundGranulation gbGran;
+
+PImage userImg;
+PImage lastUserImg;
 
 void setup() {
     size( w, h );
@@ -43,6 +49,11 @@ void setup() {
     opencv = new OpenCV( this );
     // Is still useful with ps3 i think it sets up the buffer size?
     opencv.capture(width,height);
+
+    lastUserImg = opencv.image();
+    
+    cv2 = new OpenCV( this );
+    cv2.allocate( width, height );
     
     font = loadFont( "AndaleMono.vlw" );
     textFont( font );
@@ -54,10 +65,13 @@ void setup() {
     frameRate(30);
     
     int j = 0;
-    layers = new Layer[7];
+    layers = new Layer[10];
     layers[j++] = new BlobTracker();
-    layers[j++] = new Shapes(1); // square
-    layers[j++] = new Shapes(2); // circle
+    layers[j++] = new Shapes(1,1); // square
+    layers[j++] = new Shapes(2,0.8); // circle
+    layers[j++] = new Shapes(1,0.1); // square
+    layers[j++] = new Shapes(2,0.2); // circle
+    layers[j++] = new Shapes(1,0.2,45); // square
     layers[j++] = new NextManLines();
     layers[j++] = new BigRaver();
     layers[j++] = new BigRaver(true);
@@ -103,7 +117,7 @@ void draw() {
       opencv.read();
     }
     //opencv.flip( OpenCV.FLIP_HORIZONTAL );
-    PImage rememberImage = opencv.image(); // Will use after absDiff to set image for diff next frame
+    PImage captureImage = opencv.image(); // Will use after absDiff to set image for diff next frame
    
     //opencv.invert();
     opencv.absDiff();               // Calculates the absolute difference
@@ -113,58 +127,85 @@ void draw() {
     opencv.convert( OpenCV.GRAY );  // Converts the difference image to greyscale
     //opencv.blur( OpenCV.BLUR, 3 );  // I like to blur before taking the difference image to reduce camera noise
 
+    PImage ghostImage = opencv.image();
+
+    // The ghost users
+//    if (showImage) {
+//      userImg = opencv.image();
+//      //cv2.copy( lastUserImg );
+//      //cv2.blur( OpenCV.BLUR, 3 );
+//      //cv2.brightness( 128 );
+//      //cv2.contrast( 80);
+//      //image( cv2.image(), 0, 0 );
+//      image( lastUserImg, 0, 0 );
+//      image( userImg, 0, 0 );
+//      lastUserImg = userImg;
+//      brightness
+//      //filter( THRESHOLD, 0.9 );
+//    }
+//    else {
+//      background(0);
+//    }
+    
+    // This will black and white the i,age
+    opencv.threshold(threshold);
+    
+    //Blob[] blobs = opencv.blobs( 100, width*height/3, 20, true );
+    Blob[] blobs = opencv.blobs( minBlobSize, width*height/3, numBlobs, detectHoles );
+    
     // The ghost users
     if (showImage) {
-      PImage userImg = opencv.image();
-      image( userImg, 0, 0 );
+      opencv.copy( lastUserImg );
+      cv2.blur( OpenCV.BLUR, 3 );
+      opencv.brightness( 100 );
+      opencv.contrast( 80);
+      image( opencv.image(), 0, 0 );
+      image( ghostImage, 0, 0 );
+      lastUserImg = ghostImage;
       //filter( THRESHOLD, 0.9 );
     }
     else {
       background(0);
     }
-    
-    // This will black and white the i,age
-    opencv.threshold(threshold);
  
-    //Blob[] blobs = opencv.blobs( 100, width*height/3, 20, true );
-    Blob[] blobs = opencv.blobs( minBlobSize, width*height/3, numBlobs, detectHoles );
-    
-    // Dave's sound state changer and variable?
-    if(blobs.length < 5 && interactif == true){
-     timeSinceBlob ++;
-    }
-    
-    // check if we had no blobz, turn annoying noisez off and 
-    if(timeSinceBlob == delayForSound){
-    // turn off both interactive noises
-     audioLayers[0].hide();
-     audioLayers[1].hide();
-     
-    // turn on soundscape, set variable
-    gbGran.show();
-    interactif = false;
-    println("Non - interactive mode!");
-    timeSinceBlob = 0;
-    
-    }
-    
-    if(blobs.length > 0 && interactif == false) {
-    // turn on both interactive noises
-     audioLayers[0].show();
-     audioLayers[1].show();
-     
-    // turn off soundscape, set variable
-    gbGran.hide();
-    interactif = true;
-    println("Interactive mode!");
-    }
-    
-    frameChangeCounter++;
-    if ( frameChangeCounter >= framesUntilChange ) {
-      frameChangeCounter = 0;
-      framesUntilChange = 10 + floor(random(0,81));
-      //toggleRandomLayer();
-      setRandomLayers();  
+    if ( beRandom) {
+      // Dave's sound state changer
+      if(blobs.length < 5 && interactif == true){
+       timeSinceBlob ++;
+      }
+      
+      // check if we had no blobz, turn annoying noisez off and 
+      if(timeSinceBlob == delayForSound){
+      // turn off both interactive noises
+       audioLayers[0].hide();
+       audioLayers[1].hide();
+       
+      // turn on soundscape, set variable
+      gbGran.show();
+      interactif = false;
+      println("Non - interactive mode!");
+      timeSinceBlob = 0;
+      
+      }
+      
+      if(blobs.length > 0 && interactif == false) {
+      // turn on both interactive noises
+       audioLayers[0].show();
+       audioLayers[1].show();
+       
+      // turn off soundscape, set variable
+      gbGran.hide();
+      interactif = true;
+      println("Interactive mode!");
+      }
+      
+      frameChangeCounter++;
+      if ( frameChangeCounter >= framesUntilChange ) {
+        frameChangeCounter = 0;
+        framesUntilChange = 10 + floor(random(0,81));
+        //toggleRandomLayer();
+        setRandomLayers();  
+      }
     }
  
     // Draw all visible layers   
@@ -183,10 +224,15 @@ void draw() {
     
     gbGran.draw(blobs);
     
-    if ( blurAmount > 0 ) filter( BLUR, blurAmount );
+    if ( blurAmount > 0 ) {
+      opencv.copy(this.get());
+      opencv.blur( OpenCV.BLUR, 3 );
+      image( opencv.image(), 0, 0 );
+      //filter( BLUR, blurAmount );
+    }
 
     // Remember the image to use for the next absDiff
-    opencv.copy( rememberImage );
+    opencv.copy( captureImage );
     opencv.remember(1);
 }
 
@@ -221,20 +267,10 @@ void setRandomLayers() {
   for ( int i=0; i<numLayers; i++) {
     layers[randomLayer()].show(); 
   }
-  toggleRandomAudioLayers();  
+  toggleRandomAudioLayers();
 }
 
-void toggleRandomAudioLayersOld() {
-  for ( int i=0; i<audioLayers.length; i++ ) {
-    Layer layer = audioLayers[i];
-    if ( (int)random(0,2) == 0 ) {
-      audioLayers[i].hide();
-    }
-    else {
-      audioLayers[i].show();
-    }
-  }
-}
+// Old sound random, keeps one on.
 void toggleRandomAudioLayers() {
   for ( int i=0; i<audioLayers.length; i++ ) {
     audioLayers[i].hide();
@@ -258,15 +294,7 @@ void mousePressed() {
 
 void keyPressed() {
   if (key == 'b') {
-    blurAmount = blurAmount == 0 ? 1.0 : 0;
-  }
-  else if (key == 'F') {
-    fgcol = color(255,255,0);
-    stroke(fgcol);
-  }
-  else if (key == 'f') {
-    fgcol = color(random(0,255),random(0,255),random(0,255));
-    stroke(fgcol);
+    blurAmount = blurAmount == 0 ? 1 : 0;
   }
   else if (key == 's') {
     saveFrame();
@@ -287,15 +315,19 @@ void keyPressed() {
       background(0);
     }
   }
-  else if (key == 'r') {
-    opencv.remember();
-  }
   else if (key == 'h') {
     detectHoles = detectHoles ? false : true;
     println( "detectHoles:" + detectHoles );
   }
-  else if (key == 'l') {
+  else if (key == 'r') {
+    beRandom = true;
     toggleRandomLayer();
+  }
+  else if (key == 'R') {
+    beRandom = false;
+    for ( int i=1; i<layers.length; i++ ) {
+      layers[i].visible = false;
+    }
   }
   else if (key == 'z') {
     toggleRandomAudioLayers();
