@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<controlP5 colorLabel="ffffffff" colorValue="ff000000" colorForeground="ffaaaa00" date="Sat Jun 12 15:06:20 BST 2010" colorBackground="ff505050" colorActive="ffffff00" lock="false" filepath="controlP5.xml" urlpath="">
+<window height="480" name="main" background="00000000" width="640" class="Blobber17">
+<tab name="global" width="40" id="-1" visible="1.0" open="1.0" label="global" moveable="0.0"/>
+<tab name="default" width="45" id="-1" visible="1.0" open="1.0" label="default" moveable="0.0">
+<controller name="threshold" id="-1" width="100" visible="1.0" min="0.0" type="slider" max="200.0" y="6.0" label="threshold" x="9.0" value="140.0" height="14" moveable="1.0"/>
+<controller name="numBlobs" id="-1" width="100" visible="1.0" min="1.0" type="slider" max="100.0" y="6.0" label="numBlobs" x="168.0" value="64.36" height="14" moveable="1.0"/>
+<controller name="minBlobSize" id="-1" width="100" visible="1.0" min="0.0" type="slider" max="100.0" y="6.0" label="minBlobSize" x="319.0" value="10.0" height="14" moveable="1.0"/>
+<controller name="detectHoles" id="-1" width="14" visible="1.0" type="toggle" y="28.0" label="detectHoles" x="9.0" value="1.0" height="14" moveable="1.0"/>
+<controller name="uiBeRandom" id="-1" width="14" visible="1.0" type="toggle" y="63.0" label="uiBeRandom" x="10.0" value="1.0" height="14" moveable="1.0"/>
+</tab>
+</window>
+</controlP5>
+

@@ -1,6 +1,7 @@
 import hypermedia.video.*;
 import java.awt.*;
 import processing.video.*; 
+import controlP5.*;
 
 /*
  * Config - Tweaks these
@@ -32,11 +33,11 @@ boolean showBlobs = false;
 boolean showImage = true;
 
 // Randomisation control
+boolean beRandom = true;
 int framesUntilChange = 30;
 int frameChangeCounter = 0;
 int timeSinceBlob =0 , delayForSound=50;
 boolean interactif = false;
-boolean beRandom = true;
 
 
 /*
@@ -55,6 +56,9 @@ BackgroundGranulation gbGran;
 PImage userImg;
 PImage lastUserImg;
 boolean soundFlipFlop;
+
+ControlP5 ui;
+Toggle uiBeRandom;
 
 void setup() {
     size( w, h );
@@ -122,6 +126,20 @@ void setup() {
       capture = new Capture( this, width, height, 30 );
       //capture.settings();
     }
+    
+    // Setup the UI
+    ui = new ControlP5(this);
+    ui.setColorForeground(color(170,170,0));
+    ui.setColorBackground(color(80,80,80));
+    ui.setColorActive(color(255,255,0));
+    ui.setColorValue(color(0));
+    // Note name auto binds to var of same name.
+    // Wierd: Sliders get label on side but toggle goes underneath
+    ui.addSlider("threshold",0,200,10,height-90,100,14);
+    ui.addSlider("numBlobs",1,100,10,height-70,100,14);
+    ui.addSlider("minBlobSize",0,100,10,height-50,100,14);
+    ui.addToggle("detectHoles",10,height-30,14,14);
+    uiBeRandom = ui.addToggle("uiBeRandom",true,80,height-30,14,14); // Bound to meth below.
 }
 
 
@@ -275,16 +293,33 @@ void setRandomLayers() {
   }
 }
 
-void mouseDragged() {
-    threshold = int( map(mouseX,0,width,0,255) );
-    println( "threshold:" + threshold );
+// Turn randomisation on and off keeping the UI in sync
+void randomOff() {
+    beRandom = false;
+    uiBeRandom.changeValue(0.0);
+    for ( int i=1; i<layers.length; i++ ) {
+      layers[i].visible = false;
+    }
+}
+void randomOn() {
+    beRandom = true;
+    uiBeRandom.changeValue(1.0);
+    toggleRandomLayer();
 }
 
-//void mousePressed() {
-//}
-
 void keyPressed() {
-  if (key == 'b') {
+  // Hide/Show UI and cursor with tab key
+  if ( key == '\t' ) {
+    if ( ui.isVisible() ) { 
+      ui.hide();
+      noCursor(); 
+    } 
+    else { 
+      ui.show();
+      cursor();
+    } 
+  }
+  else if (key == 'b') {
     blurAmount = blurAmount == 0 ? 1 : 0;
   }
   else if (key == 's') {
@@ -307,19 +342,11 @@ void keyPressed() {
       background(0);
     }
   }
-  else if (key == 'h') {
-    detectHoles = detectHoles ? false : true;
-    println( "detectHoles:" + detectHoles );
-  }
   else if (key == 'r') {
-    beRandom = true;
-    toggleRandomLayer();
+    randomOn();
   }
   else if (key == 'R') {
-    beRandom = false;
-    for ( int i=1; i<layers.length; i++ ) {
-      layers[i].visible = false;
-    }
+    randomOff();
   }
   else if (key == 'n' ) {
     audioLayers[0].show();
@@ -333,6 +360,10 @@ void keyPressed() {
   else if (key == 'M' ) {
     audioLayers[1].hide();
   }
-  
+}
+
+// Called from UI button
+void uiBeRandom(boolean val) {
+  if (val) { randomOn(); } else { randomOff(); }
 }
 
