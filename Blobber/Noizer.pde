@@ -14,10 +14,17 @@ class Noizer extends Layer {
     Noise n = new Noise(ac);
   
    // this is per blob
-   freqModulator = new Glide(ac, 1, 10);
+   freqModulator = new Glide(ac, 1, 1);
    Function fmod = new Function(freqModulator) {
     public float calculate() {
         return x[0];
+      }
+    };
+    
+    modulatorLR = new Glide(ac, -1, 10);
+    Function modFreq = new Function(modulatorLR) {
+      public float calculate() {
+        return x[0] * 1;
       }
     };
    
@@ -29,24 +36,21 @@ class Noizer extends Layer {
       }
     };
   
-   LPRezFilter f = new LPRezFilter( ac, function, 0.99);
+   LPRezFilter f = new LPRezFilter( ac, function, 0.94);
    f.addInput(n);
   
     Gain g = new Gain(ac, 1, 0.1);
     g.addInput(f);
       
-    modulatorLR = new Glide(ac, -1, 10);
-    Function modPan = new Function(modulatorLR) {
-      public float calculate() {
-        return x[0] * 1;
-      }
-    };
-    // println(modPan);
-  
-    Panner p = new Panner(ac , modPan);
-    p.addInput(g);
     
-  ac.out.addInput(p);
+    // println(modPan);
+    WaveShaper ws = new WaveShaper(ac);
+    ws.setPreGain(6.0);
+    ws.setPostGain(0.5);
+    ws.addInput(g);
+    
+  ac.out.addInput(ws);
+  ac.out.addInput(lfo);
   
   }
   
@@ -64,7 +68,7 @@ class Noizer extends Layer {
       myFM = map(blobs.length, 0, blobs.length, 0.1, 10.0);
       modulatorLR.setValue(myX);
       modulatorUD.setValue(myY);
-      freqModulator.setValue(myFM);
+      //freqModulator.setValue(myFM);
     }
     
     return true;
