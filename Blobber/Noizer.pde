@@ -59,7 +59,7 @@ class Noizer extends Layer {
       // print(myX);
       myY = map(soundBlob1.y, 0, height, 3000, 0);
       
-      myFM = map(soundBlob1.y, 0, height, 0.1, 10.0);
+      myFM = map(blobs.length, 0, blobs.length, 0.1, 10.0);
       modulatorLR.setValue(myX);
       modulatorUD.setValue(myY);
       freqModulator.setValue(myFM);

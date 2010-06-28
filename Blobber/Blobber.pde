@@ -84,7 +84,7 @@ void draw() {
     else {
       opencv.read();
     }
-    opencv.flip( OpenCV.FLIP_HORIZONTAL );
+    //opencv.flip( OpenCV.FLIP_HORIZONTAL );
     PImage rememberImage = opencv.image(); // Will use after absDiff to set image for diff next frame
    
     //opencv.invert();
