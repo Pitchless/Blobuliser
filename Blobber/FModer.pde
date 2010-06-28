@@ -50,12 +50,12 @@ class FModer extends Layer {
     
     
     WavePlayer wp1 = new WavePlayer(ac, carrierMod, Buffer.SINE);
-    Gain g = new Gain(ac, 1, 0.1);
+    Gain g = new Gain(ac, 1, 0.15);
     g.addInput(wp1);
     ac.out.addInput(g);
     
     WavePlayer wp2 = new WavePlayer(ac, carrierMod2, Buffer.SINE);
-    Gain g2 = new Gain(ac, 1, 0.1);
+    Gain g2 = new Gain(ac, 1, 0.15);
     g2.addInput(wp2);
     ac.out.addInput(g2);
     

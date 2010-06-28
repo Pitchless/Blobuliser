@@ -19,7 +19,6 @@ class CatsCradle extends Layer {
       Point blob = blobs[i].centroid;
       for( int j=0; j<blobs.length; j++ ) {
         Point blob2 = blobs[j].centroid;
-        if ( i % 4 == 0 ) cycleColor();
         colorMode(HSB);
         color linecol = color( hue(fgcol), 255, 255, 100 );
         colorMode(RGB);

@@ -43,10 +43,14 @@ class BigRaver extends Layer {
       }
       img.beginDraw();
       for( int i=start; i<len; i++ ) {
+         if ( i % 5 == 0 ) cycleColor();
          Point blob1 = blobs[i].centroid;
+         colorMode(HSB);
+         color linecol = color( hue(fgcol), 255, 255, 200 );
+         colorMode(RGB);         
          img.strokeWeight(1);
+         img.stroke(linecol);
          img.line( raver.x, raver.y , blob1.x, blob1.y );
-         img.stroke(fgcol);
       }
       img.endDraw();
     }

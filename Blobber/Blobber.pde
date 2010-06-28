@@ -9,8 +9,8 @@ OpenCV cv2;
 int w = 640;
 int h = 480;
 boolean ps3cam = true;
-int threshold = 80;
-int numBlobs = 14;
+int threshold = 60;
+int numBlobs = 16;
 boolean detectHoles = true;
 int minBlobSize = 10;
 float fadeDown = 0.8;   // Percent reduction per frame for ghost lines.
@@ -20,7 +20,7 @@ boolean showBlobs = false;
 boolean showImage = true;
 int framesUntilChange = 30;
 int frameChangeCounter = 0;
-int timeSinceBlob =0 , delayForSound=10;
+int timeSinceBlob =0 , delayForSound=50;
 boolean interactif = false;
 boolean beRandom = true;
 
@@ -38,6 +38,7 @@ BackgroundGranulation gbGran;
 
 PImage userImg;
 PImage lastUserImg;
+boolean soundFlipFlop;
 
 void setup() {
     size( w, h );
@@ -65,9 +66,15 @@ void setup() {
     frameRate(30);
     
     int j = 0;
-    layers = new Layer[10];
+    layers = new Layer[15];
     layers[j++] = new BlobTracker();
-    layers[j++] = new Shapes(1,1); // square
+    layers[j++] = new Shapes2(1); // square
+    layers[j++] = new BigRaver(true, 0.986);
+    layers[j++] = new CatsCradle();
+    layers[j++] = new Filler(1);
+    layers[j++] = new Filler2(1);
+    layers[j++] = new Filler2(2);
+    layers[j++] = new Shapes(1,0.9); // square
     layers[j++] = new Shapes(2,0.8); // circle
     layers[j++] = new Shapes(1,0.1); // square
     layers[j++] = new Shapes(2,0.2); // circle
@@ -75,7 +82,6 @@ void setup() {
     layers[j++] = new NextManLines();
     layers[j++] = new BigRaver();
     layers[j++] = new BigRaver(true);
-    layers[j++] = new CatsCradle();
 
     j = 0;
     audioLayers = new Layer[2];
@@ -171,34 +177,35 @@ void draw() {
     if ( beRandom) {
       // Dave's sound state changer
       if(blobs.length < 5 && interactif == true){
-       timeSinceBlob ++;
+        timeSinceBlob ++;
       }
-      
+  
       // check if we had no blobz, turn annoying noisez off and 
       if(timeSinceBlob == delayForSound){
-      // turn off both interactive noises
-       audioLayers[0].hide();
-       audioLayers[1].hide();
-       
-      // turn on soundscape, set variable
-      gbGran.show();
-      interactif = false;
-      println("Non - interactive mode!");
-      timeSinceBlob = 0;
-      
+        // turn off both interactive noises
+        audioLayers[0].hide();
+        audioLayers[1].hide();
+  
+        // turn on soundscape, set variable
+        gbGran.setSamples();
+        gbGran.show();
+        interactif = false;
+        println("Non - interactive mode!");
+        timeSinceBlob = 0;
+  
       }
-      
+
       if(blobs.length > 0 && interactif == false) {
-      // turn on both interactive noises
-       audioLayers[0].show();
-       audioLayers[1].show();
-       
-      // turn off soundscape, set variable
-      gbGran.hide();
-      interactif = true;
-      println("Interactive mode!");
+        // turn on both interactive noises
+        if ( soundFlipFlop ) { audioLayers[0].show();audioLayers[1].hide(); } else { audioLayers[1].show(); audioLayers[0].hide();}
+        soundFlipFlop = !soundFlipFlop;
+  
+        // turn off soundscape, set variable
+        gbGran.hide();
+        interactif = true;
+        println("Interactive mode!");
       }
-      
+        
       frameChangeCounter++;
       if ( frameChangeCounter >= framesUntilChange ) {
         frameChangeCounter = 0;
@@ -226,6 +233,7 @@ void draw() {
     
     if ( blurAmount > 0 ) {
       opencv.copy(this.get());
+      //opencv.convert( OpenCV.RGB );
       opencv.blur( OpenCV.BLUR, 3 );
       image( opencv.image(), 0, 0 );
       //filter( BLUR, blurAmount );
@@ -267,7 +275,7 @@ void setRandomLayers() {
   for ( int i=0; i<numLayers; i++) {
     layers[randomLayer()].show(); 
   }
-  toggleRandomAudioLayers();
+  //toggleRandomAudioLayers();
 }
 
 // Old sound random, keeps one on.
@@ -311,7 +319,8 @@ void keyPressed() {
       println("Layer " + i + " does not exist");
     }
     else {
-      layers[i-1].toggleVisible();
+      //layers[i-1].toggleVisible();
+      if ( layers[i-1].visible ) { layers[i-1].hide(); } else { layers[i-1].show(); }
       background(0);
     }
   }

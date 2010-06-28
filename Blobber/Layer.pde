@@ -44,7 +44,7 @@ class Layer {
         float a = alpha(img.pixels[i]);
         //colorMode( HSB, 1.0 );
         img.pixels[i] = color( r * amt, g * amt, b * amt, a * amt );
-        colorMode( RGB, 255 );
+        colorMode( RGB );
     }
     img.updatePixels();
   }
