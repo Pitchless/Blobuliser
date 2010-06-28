@@ -17,9 +17,9 @@ class Noizer extends Layer {
    freqModulator = new Glide(ac, 1, 10);
    Function fmod = new Function(freqModulator) {
     public float calculate() {
-      return x[0];
-    }
-  };
+        return x[0];
+      }
+    };
    
    WavePlayer lfo = new WavePlayer(ac, fmod, Buffer.SINE);
    modulatorUD = new Glide(ac, 1, 10);
@@ -51,6 +51,8 @@ class Noizer extends Layer {
   }
   
   Boolean draw( Blob[] blobs ) {
+    if ( !visible ) return false;
+    
     // sound modulation stuff
     float myX, myY, myFM;
     if(blobs.length>0) {
@@ -66,6 +68,16 @@ class Noizer extends Layer {
     }
     
     return true;
+  }
+  
+  void hide() {
+    println("hello hide noizer");
+    ac.out.pause(true);
+  }
+  
+  void show() {
+    println("hello show noizer");
+    ac.out.pause(false);
   }
 }
 

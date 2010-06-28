@@ -26,6 +26,7 @@ color bgcol = color(0);
 color fgcol = color(255, 255, 0);
 
 Layer[] layers;
+Layer[] audioLayers;
 
 Capture capture;
 
@@ -50,7 +51,7 @@ void setup() {
     frameRate(30);
     
     int j = 0;
-    layers = new Layer[8];
+    layers = new Layer[7];
     layers[j++] = new BlobTracker();
     layers[j++] = new Shapes(1); // square
     layers[j++] = new Shapes(2); // circle
@@ -58,13 +59,21 @@ void setup() {
     layers[j++] = new BigRaver();
     layers[j++] = new BigRaver(true);
     layers[j++] = new CatsCradle();
-    layers[j++] = new Noizer(); // must be last!
 
+    j = 0;
+    audioLayers = new Layer[2];
+    audioLayers[j++] = new Noizer();
+    audioLayers[j++] = new FModer();
+    
     println("Setting up layers");
     for ( int i=0; i<layers.length; i++ ) {
       layers[i].setup();
     }
-    println("Setup " + layers.length + " layers");
+    println("Setup " + layers.length + " video layers");
+    for ( int i=0; i<audioLayers.length; i++ ) {
+      audioLayers[i].setup();
+    }
+    println("Setup " + audioLayers.length + " audio layers");
     toggleRandomLayer();
 
     if ( ps3cam ) {
@@ -119,7 +128,7 @@ void draw() {
       framesUntilChange = 10 + floor(random(0,81));
       //toggleRandomLayer();
       setRandomLayers();  
-  }
+    }
  
     // Draw all visible layers   
     for ( int i=0; i<layers.length; i++ ) {
@@ -127,7 +136,14 @@ void draw() {
         layers[i].draw( blobs );
       }
     }
-
+    
+    // Draw all audio layers   
+    for ( int i=0; i<audioLayers.length; i++ ) {
+      if ( audioLayers[i].visible ) {
+        audioLayers[i].draw( blobs );
+      }
+    }
+    
     if ( blurAmount > 0 ) filter( BLUR, blurAmount );
 
     // Remember the image to use for the next absDiff
@@ -149,7 +165,7 @@ void toggleLayer( int layerOn ) {
 }
 
 int randomLayer() {
-    int layerOn = (int)random( 1, layers.length-1 );
+    int layerOn = (int)random( 1, layers.length );
     return layerOn;
 }
 
@@ -165,7 +181,30 @@ void setRandomLayers() {
   println("num layers" + numLayers);
   for ( int i=0; i<numLayers; i++) {
     layers[randomLayer()].show(); 
-  }  
+  }
+  toggleRandomAudioLayers();  
+}
+
+void toggleRandomAudioLayersOld() {
+  for ( int i=0; i<audioLayers.length; i++ ) {
+    Layer layer = audioLayers[i];
+    if ( (int)random(0,2) == 0 ) {
+      audioLayers[i].hide();
+    }
+    else {
+      audioLayers[i].show();
+    }
+  }
+}
+void toggleRandomAudioLayers() {
+  for ( int i=0; i<audioLayers.length; i++ ) {
+    audioLayers[i].hide();
+  }
+  int numLayers = (int)random(1,3);
+  println("num audio layers" + numLayers);
+  for ( int i=0; i<numLayers; i++) {
+    audioLayers[(int)random( 0, audioLayers.length )].show(); 
+  }
 }
 
 
@@ -219,9 +258,21 @@ void keyPressed() {
   else if (key == 'l') {
     toggleRandomLayer();
   }
-  else if (key == 'r') {
-    setRandomLayers();
+  else if (key == 'z') {
+    toggleRandomAudioLayers();
   }
-
+  else if (key == 'n' ) {
+    audioLayers[0].show();
+  }
+  else if (key == 'N' ) {
+    audioLayers[0].hide();
+  }
+  else if (key == 'm' ) {
+    audioLayers[1].show();
+  }
+  else if (key == 'M' ) {
+    audioLayers[1].hide();
+  }
+  
 }
 
