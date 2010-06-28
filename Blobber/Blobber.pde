@@ -7,16 +7,16 @@ OpenCV opencv;
 
 int w = 640;
 int h = 480;
+boolean ps3cam = true;
 int threshold = 40;
 int numBlobs = 16;
 boolean detectHoles = true;
 int minBlobSize = 10;
 float fadeDown = 0.8;   // Percent reduction per frame for ghost lines.
-// Blur the shadow lines. e.g. 1 or 2. 0 disables. Slow!
+// Blur the image 1 or 2. 0 disables. Slow!
 float blurAmount = 0;
 boolean showBlobs = false;
 boolean showImage = true;
-boolean showArtLayer = true;
 
 PFont font;
 
@@ -24,61 +24,73 @@ boolean mirror = false;
 color bgcol = color(0);
 color fgcol = color(255, 255, 0);
 
-PGraphics artLayer;
-
 Layer[] layers;
 
+Capture capture;
 
 void setup() {
     size( w, h );
 
-String[] devices = Capture.list();
-println(devices);
+    // List cameras
+    String[] devices = Capture.list();
+    println(devices);
 
     opencv = new OpenCV( this );
-    opencv.capture(width,height,2);
+    // Is still useful with ps3 i think it sets up the buffer size?
+    opencv.capture(width,height);
     
     font = loadFont( "AndaleMono.vlw" );
     textFont( font );
 
     println( "Drag mouse inside sketch window to change threshold" );
-    println( "Press space bar to record background image" );
     
     background(bgcol);
     smooth();
-    
-    artLayer = createGraphics( width, height, P3D );
-    
-    //Layer layer1 = new NextManLines();
-    
-    layers = new Layer[6];
+        
+    layers = new Layer[7];
     layers[0] = new BlobTracker();
     layers[4] = new Squares();
     layers[1] = new NextManLines();
     layers[2] = new BigRaver();
     layers[3] = new BigRaver(true);
     layers[5] = new CatsCradle();
+    layers[6] = new Noizer();
 
     println("Setting up layers");
     for ( int i=0; i<layers.length; i++ ) {
       layers[i].setup();
     }
     println("Setup " + layers.length + " layers");
+
+    if ( ps3cam ) {
+      capture = new Capture( this, width, height, 30 );
+      capture.settings();
+    }
 }
 
 
 
 void draw() {
-    
     //background(0);
-    opencv.read();
-    //opencv.invert();
-    opencv.absDiff();               //  Calculates the absolute difference
-    opencv.remember();             // diff image for next frame, track movement
-    
+
+    if ( ps3cam ) {
+      if ( !capture.available() ) {
+        println( "No capture" );
+        return;  // no point rendering without a frame!
+      };
+      capture.read();
+      opencv.copy( capture );
+    }
+    else {
+      opencv.read();
+    }
     opencv.flip( OpenCV.FLIP_HORIZONTAL );
-    opencv.convert( OpenCV.GRAY );  //  Converts the difference image to greyscale
-    opencv.blur( OpenCV.BLUR, 3 );  //  I like to blur before taking the difference image to reduce camera noise
+    PImage rememberImage = opencv.image(); // Will use after absDiff to set image for diff next frame
+   
+    //opencv.invert();
+    opencv.absDiff();               // Calculates the absolute difference
+    opencv.convert( OpenCV.GRAY );  // Converts the difference image to greyscale
+    opencv.blur( OpenCV.BLUR, 3 );  // I like to blur before taking the difference image to reduce camera noise
 
     // The ghost users
     if (showImage) {
@@ -87,7 +99,7 @@ void draw() {
     else {
       background(0);
     }
-
+ 
     // This will black and white the i,age
     opencv.threshold(threshold);
 
@@ -102,6 +114,11 @@ void draw() {
     }
 
     if ( blurAmount > 0 ) filter( BLUR, blurAmount );
+
+    // Remember the image to use for the next absDiff
+    opencv.copy( rememberImage );
+    opencv.remember(1);
+
 }
 
 public void stop() {
@@ -116,7 +133,6 @@ void mouseDragged() {
 
 void mousePressed() {
     background(bgcol);
-    artLayer.background(bgcol);
 }
 
 void keyPressed() {

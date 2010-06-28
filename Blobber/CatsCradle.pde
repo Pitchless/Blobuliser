@@ -2,7 +2,7 @@ class CatsCradle extends Layer {
 
   Boolean   isCentered   = false;
   Float     fadePerFrame = 0.66;
-  int       fg           = color(255,0,0,70);
+  int       fg           = color(255,0,0,75);
   
   CatsCradle() {
   }
