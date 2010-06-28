@@ -19,6 +19,8 @@ boolean showBlobs = false;
 boolean showImage = true;
 int framesUntilChange = 30;
 int frameChangeCounter = 0;
+int timeSinceBlob =0 , delayForSound=10;
+boolean interactif;
 
 PFont font;
 
@@ -29,6 +31,7 @@ Layer[] layers;
 Layer[] audioLayers;
 
 Capture capture;
+BackgroundGranulation gbGran;
 
 void setup() {
     size( w, h );
@@ -64,6 +67,7 @@ void setup() {
     audioLayers = new Layer[2];
     audioLayers[j++] = new Noizer();
     audioLayers[j++] = new FModer();
+    gbGran = new BackgroundGranulation();
     
     println("Setting up layers");
     for ( int i=0; i<layers.length; i++ ) {
@@ -121,7 +125,39 @@ void draw() {
 
     //Blob[] blobs = opencv.blobs( 100, width*height/3, 20, true );
     Blob[] blobs = opencv.blobs( minBlobSize, width*height/3, numBlobs, detectHoles );
- 
+    
+    // Dave's sound state changer and variable?
+    if(blobs.length == 0 && interactif == false){
+     timeSinceBlob ++;
+    }
+    
+    // check if we had no blobz, turn annoying noisez off and 
+    if(timeSinceBlob == delayForSound){
+    // turn off both interactive noises
+     gbGran.hide();
+     gbGran.hide();
+     
+    // turn on soundscape, set variable
+    gbGran.show();
+    interactif = false;
+    println("Non - interactive mode!");
+    
+    }
+    
+    
+    if(blobs.length > 0 && interactif == false) {
+    // turn on both interactive noises
+     gbGran.show();
+     gbGran.show();
+     
+    // turn off soundscape, set variable
+    gbGran.hide();
+    interactif = true;
+    println("Interactive mode!");
+    }
+    
+    
+    
     frameChangeCounter++;
     if ( frameChangeCounter >= framesUntilChange ) {
       frameChangeCounter = 0;
@@ -143,6 +179,8 @@ void draw() {
         audioLayers[i].draw( blobs );
       }
     }
+    
+    gbGran.draw(blobs);
     
     if ( blurAmount > 0 ) filter( BLUR, blurAmount );
 
