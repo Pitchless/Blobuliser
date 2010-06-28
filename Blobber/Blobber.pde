@@ -4,12 +4,13 @@ import processing.video.*;
 
 
 OpenCV opencv;
+OpenCV cv2;
 
 int w = 640;
 int h = 480;
-boolean ps3cam = false;
-int threshold = 40;
-int numBlobs = 11;
+boolean ps3cam = true;
+int threshold = 80;
+int numBlobs = 14;
 boolean detectHoles = true;
 int minBlobSize = 10;
 float fadeDown = 0.8;   // Percent reduction per frame for ghost lines.
@@ -19,10 +20,9 @@ boolean showBlobs = false;
 boolean showImage = true;
 int framesUntilChange = 30;
 int frameChangeCounter = 0;
-int timeSinceBlob =0 , delayForSound=50;
+int timeSinceBlob =0 , delayForSound=10;
 boolean interactif = false;
 boolean beRandom = true;
-boolean soundFlipFlop;
 
 PFont font;
 
@@ -36,196 +36,226 @@ Capture capture;
 PImage captureImage; // Stash the image after capture
 BackgroundGranulation gbGran;
 
+PImage userImg;
+PImage lastUserImg;
+
 void setup() {
-  size( w, h);
+    size( w, h );
 
-  // List cameras
-  // String[] devices = Capture.list();
-  //println(devices);
+    // List cameras
+    String[] devices = Capture.list();
+    println(devices);
 
-  opencv = new OpenCV( this );
-  // Is still useful with ps3 i think it sets up the buffer size?
-  opencv.capture(width,height);
+    opencv = new OpenCV( this );
+    // Is still useful with ps3 i think it sets up the buffer size?
+    opencv.capture(width,height);
 
-  font = loadFont( "AndaleMono.vlw" );
-  textFont( font );
+    lastUserImg = opencv.image();
+    
+    cv2 = new OpenCV( this );
+    cv2.allocate( width, height );
+    
+    font = loadFont( "AndaleMono.vlw" );
+    textFont( font );
 
-  println( "Drag mouse inside sketch window to change threshold" );
+    println( "Drag mouse inside sketch window to change threshold" );
+    
+    background(bgcol);
+    smooth();
+    frameRate(30);
+    
+    int j = 0;
+    layers = new Layer[10];
+    layers[j++] = new BlobTracker();
+    layers[j++] = new Shapes(1,1); // square
+    layers[j++] = new Shapes(2,0.8); // circle
+    layers[j++] = new Shapes(1,0.1); // square
+    layers[j++] = new Shapes(2,0.2); // circle
+    layers[j++] = new Shapes(1,0.2,45); // square
+    layers[j++] = new NextManLines();
+    layers[j++] = new BigRaver();
+    layers[j++] = new BigRaver(true);
+    layers[j++] = new CatsCradle();
 
-  background(bgcol);
-  smooth();
-  frameRate(30);
+    j = 0;
+    audioLayers = new Layer[2];
+    audioLayers[j++] = new Noizer();
+    audioLayers[j++] = new FModer();
+    gbGran = new BackgroundGranulation();
+    gbGran.setup();
+    
+    println("Setting up layers");
+    for ( int i=0; i<layers.length; i++ ) {
+      layers[i].setup();
+    }
+    println("Setup " + layers.length + " video layers");
+    for ( int i=0; i<audioLayers.length; i++ ) {
+      audioLayers[i].setup();
+    }
+    println("Setup " + audioLayers.length + " audio layers");
+    toggleRandomLayer();
 
-  int j = 0;
-  layers = new Layer[7];
-  layers[j++] = new BlobTracker();
-  layers[j++] = new Shapes(1); // square
-  layers[j++] = new Shapes(2); // circle
-  layers[j++] = new NextManLines();
-  layers[j++] = new BigRaver();
-  layers[j++] = new BigRaver(true);
-  layers[j++] = new CatsCradle();
-
-  j = 0;
-  audioLayers = new Layer[2];
-  audioLayers[j++] = new Noizer();
-  audioLayers[j++] = new FModer();
-  gbGran = new BackgroundGranulation();
-  gbGran.setup();
-
-  println("Setting up layers");
-  for ( int i=0; i<layers.length; i++ ) {
-    layers[i].setup();
-  }
-  println("Setup " + layers.length + " video layers");
-  for ( int i=0; i<audioLayers.length; i++ ) {
-    audioLayers[i].setup();
-  }
-  println("Setup " + audioLayers.length + " audio layers");
-  toggleRandomLayer();
-
-  if ( ps3cam ) {
-    capture = new Capture( this, width, height, 30 );
-    //capture.settings();
-  }
+    if ( ps3cam ) {
+      capture = new Capture( this, width, height, 30 );
+      //capture.settings();
+    }
 }
 
 
 void draw() {
-  //background(0);
+    //background(0);
 
-  if ( ps3cam ) {
-    if ( !capture.available() ) {
-      println( "No capture" );
-      return;  // no point rendering without a frame!
-    };
-    capture.read();
-    opencv.copy( capture );
-  }
-  else {
-    opencv.read();
-  }
-  opencv.flip( OpenCV.FLIP_HORIZONTAL );
-  PImage captureImage = opencv.image(); // Will use after absDiff to set image for diff next frame
-
-    //opencv.invert();
-  opencv.absDiff();               // Calculates the absolute difference
-  //opencv.remember();
-  //opencv.flip( OpenCV.FLIP_HORIZONTAL );
-
-  opencv.convert( OpenCV.GRAY );  // Converts the difference image to greyscale
-  //opencv.blur( OpenCV.BLUR, 3 );  // I like to blur before taking the difference image to reduce camera noise
-
-  // The ghost users
-  if (showImage) {
-    PImage userImg = opencv.image();
-    image( userImg, 0, 0 );
-    //filter( THRESHOLD, 0.9 );
-  }
-  else {
-    background(0);
-  }
-
-  // This will black and white the i,age
-  opencv.threshold(threshold);
-
-  //Blob[] blobs = opencv.blobs( 100, width*height/3, 20, true );
-  Blob[] blobs = opencv.blobs( minBlobSize, width*height/3, numBlobs, detectHoles );
-
-  if ( beRandom) {
-    // Dave's sound state changer
-    if(blobs.length < 5 && interactif == true){
-      timeSinceBlob ++;
+    if ( ps3cam ) {
+      if ( !capture.available() ) {
+        println( "No capture" );
+        return;  // no point rendering without a frame!
+      };
+      capture.read();
+      opencv.copy( capture );
     }
+    else {
+      opencv.read();
+    }
+    //opencv.flip( OpenCV.FLIP_HORIZONTAL );
+    PImage captureImage = opencv.image(); // Will use after absDiff to set image for diff next frame
+   
+    //opencv.invert();
+    opencv.absDiff();               // Calculates the absolute difference
+    //opencv.remember();
+    //opencv.flip( OpenCV.FLIP_HORIZONTAL );
 
-    // check if we had no blobz, turn annoying noisez off and 
-    if(timeSinceBlob == delayForSound){
+    opencv.convert( OpenCV.GRAY );  // Converts the difference image to greyscale
+    //opencv.blur( OpenCV.BLUR, 3 );  // I like to blur before taking the difference image to reduce camera noise
+
+    PImage ghostImage = opencv.image();
+
+    // The ghost users
+//    if (showImage) {
+//      userImg = opencv.image();
+//      //cv2.copy( lastUserImg );
+//      //cv2.blur( OpenCV.BLUR, 3 );
+//      //cv2.brightness( 128 );
+//      //cv2.contrast( 80);
+//      //image( cv2.image(), 0, 0 );
+//      image( lastUserImg, 0, 0 );
+//      image( userImg, 0, 0 );
+//      lastUserImg = userImg;
+//      brightness
+//      //filter( THRESHOLD, 0.9 );
+//    }
+//    else {
+//      background(0);
+//    }
+    
+    // This will black and white the i,age
+    opencv.threshold(threshold);
+    
+    //Blob[] blobs = opencv.blobs( 100, width*height/3, 20, true );
+    Blob[] blobs = opencv.blobs( minBlobSize, width*height/3, numBlobs, detectHoles );
+    
+    // The ghost users
+    if (showImage) {
+      opencv.copy( lastUserImg );
+      cv2.blur( OpenCV.BLUR, 3 );
+      opencv.brightness( 100 );
+      opencv.contrast( 80);
+      image( opencv.image(), 0, 0 );
+      image( ghostImage, 0, 0 );
+      lastUserImg = ghostImage;
+      //filter( THRESHOLD, 0.9 );
+    }
+    else {
+      background(0);
+    }
+ 
+    if ( beRandom) {
+      // Dave's sound state changer
+      if(blobs.length < 5 && interactif == true){
+       timeSinceBlob ++;
+      }
+      
+      // check if we had no blobz, turn annoying noisez off and 
+      if(timeSinceBlob == delayForSound){
       // turn off both interactive noises
-      audioLayers[0].hide();
-      audioLayers[1].hide();
-
+       audioLayers[0].hide();
+       audioLayers[1].hide();
+       
       // turn on soundscape, set variable
-      gbGran.setSamples();
       gbGran.show();
       interactif = false;
       println("Non - interactive mode!");
       timeSinceBlob = 0;
-
-    }
-
-    if(blobs.length > 0 && interactif == false) {
+      
+      }
+      
+      if(blobs.length > 0 && interactif == false) {
       // turn on both interactive noises
-      if ( soundFlipFlop ) { audioLayers[0].show();audioLayers[1].hide(); } else { audioLayers[1].show(); audioLayers[0].hide();}
-      soundFlipFlop = !soundFlipFlop;
-
+       audioLayers[0].show();
+       audioLayers[1].show();
+       
       // turn off soundscape, set variable
       gbGran.hide();
       interactif = true;
       println("Interactive mode!");
+      }
+      
+      frameChangeCounter++;
+      if ( frameChangeCounter >= framesUntilChange ) {
+        frameChangeCounter = 0;
+        framesUntilChange = 10 + floor(random(0,81));
+        //toggleRandomLayer();
+        setRandomLayers();  
+      }
+    }
+ 
+    // Draw all visible layers   
+    for ( int i=0; i<layers.length; i++ ) {
+      if ( layers[i].visible ) {
+        layers[i].draw( blobs );
+      }
+    }
+    
+    // Draw all audio layers   
+    for ( int i=0; i<audioLayers.length; i++ ) {
+      if ( audioLayers[i].visible ) {
+        audioLayers[i].draw( blobs );
+      }
+    }
+    
+    gbGran.draw(blobs);
+    
+    if ( blurAmount > 0 ) {
+      opencv.copy(this.get());
+      opencv.blur( OpenCV.BLUR, 3 );
+      image( opencv.image(), 0, 0 );
+      //filter( BLUR, blurAmount );
     }
 
-    frameChangeCounter++;
-    if ( frameChangeCounter >= framesUntilChange ) {
-      frameChangeCounter = 0;
-      framesUntilChange = 10 + floor(random(0,81));
-      //toggleRandomLayer();
-      setRandomLayers();  
-    }
-  }
-
-  // Draw all visible layers   
-  for ( int i=0; i<layers.length; i++ ) {
-    if ( layers[i].visible ) {
-      layers[i].draw( blobs );
-    }
-  }
-
-  // Draw all audio layers   
-  for ( int i=0; i<audioLayers.length; i++ ) {
-    if ( audioLayers[i].visible ) {
-      audioLayers[i].draw( blobs );
-    }
-  }
-
-  gbGran.draw(blobs);
-
-  if ( blurAmount > 0 ) {
-    opencv.copy(this.get());
-    opencv.blur( OpenCV.BLUR, 3 );
-    image( opencv.image(), 0, 0 );
-    //filter( BLUR, blurAmount );
-  }
-
-  // Remember the image to use for the next absDiff
-  opencv.copy( captureImage );
-  opencv.remember(1);
+    // Remember the image to use for the next absDiff
+    opencv.copy( captureImage );
+    opencv.remember(1);
 }
 
 public void stop() {
-  opencv.stop();
-  super.stop();
+    opencv.stop();
+    super.stop();
 }
 
 void toggleLayer( int layerOn ) {
   for ( int i=0; i<layers.length; i++ ) {
     Layer layer = layers[i];
     println("toggle layer:" + layerOn);
-    if ( i==layerOn ) { 
-      layer.show(); 
-    } 
-    else { 
-      layer.hide(); 
-    } 
+    if ( i==layerOn ) { layer.show(); } else { layer.hide(); } 
   }
 }
 
 int randomLayer() {
-  int layerOn = (int)random( 1, layers.length );
-  return layerOn;
+    int layerOn = (int)random( 1, layers.length );
+    return layerOn;
 }
 
 void toggleRandomLayer() {
-  toggleLayer( randomLayer() );
+    toggleLayer( randomLayer() );
 }
 
 void setRandomLayers() {
@@ -237,6 +267,7 @@ void setRandomLayers() {
   for ( int i=0; i<numLayers; i++) {
     layers[randomLayer()].show(); 
   }
+  toggleRandomAudioLayers();
 }
 
 // Old sound random, keeps one on.
@@ -253,12 +284,12 @@ void toggleRandomAudioLayers() {
 
 
 void mouseDragged() {
-  threshold = int( map(mouseX,0,width,0,255) );
-  println( "threshold:" + threshold );
+    threshold = int( map(mouseX,0,width,0,255) );
+    println( "threshold:" + threshold );
 }
 
 void mousePressed() {
-  background(bgcol);
+    background(bgcol);
 }
 
 void keyPressed() {
@@ -313,7 +344,6 @@ void keyPressed() {
   else if (key == 'M' ) {
     audioLayers[1].hide();
   }
-
+  
 }
-
 
