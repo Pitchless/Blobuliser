@@ -2,32 +2,48 @@ import hypermedia.video.*;
 import java.awt.*;
 import processing.video.*; 
 
+/*
+ * Config - Tweaks these
+ */
 
-OpenCV opencv;
-OpenCV cv2;
-
+// Sketch size
 int w = 640;
 int h = 480;
-boolean ps3cam = true;
+
+// Some cams give mirror image
+boolean flipCam = true;
+// Use ps3 eye cam hack, read via processing and pass to opencv
+boolean ps3cam = false;
+
+// OpenCV blob detection settings
 int threshold = 60;
 int numBlobs = 16;
 boolean detectHoles = true;
 int minBlobSize = 10;
-float fadeDown = 0.8;   // Percent reduction per frame for ghost lines.
-// Blur the image, should be odd int
+
+// Percent reduction per frame for ghost lines.
+float fadeDown = 0.8;
+
+// Blur the image, should be odd int. Broken! black and whites the image
 int blurAmount = 0;
+
 boolean showBlobs = false;
+
 boolean showImage = true;
+
+// Randomisation control
 int framesUntilChange = 30;
 int frameChangeCounter = 0;
 int timeSinceBlob =0 , delayForSound=50;
 boolean interactif = false;
 boolean beRandom = true;
 
-PFont font;
 
-color bgcol = color(0);
-color fgcol = color(255, 255, 0);
+/*
+ * Sketch globals - don't touch!
+ */
+
+OpenCV opencv;
 
 Layer[] layers;
 Layer[] audioLayers;
@@ -42,28 +58,24 @@ boolean soundFlipFlop;
 
 void setup() {
     size( w, h );
-
+    background(0);
+    smooth();
+    frameRate(30);
+    
     // List cameras
     String[] devices = Capture.list();
     println(devices);
 
     opencv = new OpenCV( this );
-    // Is still useful with ps3 i think it sets up the buffer size?
-    opencv.capture(width,height);
-
+    opencv.capture(width,height); // Is still useful with ps3 i think it sets up the buffer size?
     lastUserImg = opencv.image();
-    
-    cv2 = new OpenCV( this );
-    cv2.allocate( width, height );
-    
-    font = loadFont( "AndaleMono.vlw" );
+       
+    PFont font = loadFont( "AndaleMono.vlw" );
     textFont( font );
 
     println( "Drag mouse inside sketch window to change threshold" );
-    
-    background(bgcol);
-    smooth();
-    frameRate(30);
+ 
+    // Create all the effect layers we will use   
     int j = 0;
     layers = new Layer[19];
     layers[j++] = new BlobTracker();
@@ -86,6 +98,7 @@ void setup() {
     layers[j++] = new BigRaver();
     layers[j++] = new BigRaver(true);
 
+    // and the audio layers
     j = 0;
     audioLayers = new Layer[2];
     audioLayers[j++] = new Noizer();
@@ -93,6 +106,7 @@ void setup() {
     gbGran = new BackgroundGranulation();
     gbGran.setup();
     
+    // Setup all the crap we created above
     println("Setting up layers");
     for ( int i=0; i<layers.length; i++ ) {
       layers[i].setup();
@@ -112,8 +126,7 @@ void setup() {
 
 
 void draw() {
-    //background(0);
-
+    // Grab the camera image
     if ( ps3cam ) {
       if ( !capture.available() ) {
         println( "No capture" );
@@ -125,38 +138,19 @@ void draw() {
     else {
       opencv.read();
     }
-    //opencv.flip( OpenCV.FLIP_HORIZONTAL );
     PImage captureImage = opencv.image(); // Will use after absDiff to set image for diff next frame
-   
+
     //opencv.invert();
+    opencv.blur( OpenCV.BLUR, 3 );  // I like to blur before taking the difference image to reduce camera noise
     opencv.absDiff();               // Calculates the absolute difference
-    //opencv.remember();
-    //opencv.flip( OpenCV.FLIP_HORIZONTAL );
+    if (!ps3cam) opencv.remember();
+    if (flipCam) opencv.flip( OpenCV.FLIP_HORIZONTAL );
 
     opencv.convert( OpenCV.GRAY );  // Converts the difference image to greyscale
-    //opencv.blur( OpenCV.BLUR, 3 );  // I like to blur before taking the difference image to reduce camera noise
 
     PImage ghostImage = opencv.image();
-
-    // The ghost users
-//    if (showImage) {
-//      userImg = opencv.image();
-//      //cv2.copy( lastUserImg );
-//      //cv2.blur( OpenCV.BLUR, 3 );
-//      //cv2.brightness( 128 );
-//      //cv2.contrast( 80);
-//      //image( cv2.image(), 0, 0 );
-//      image( lastUserImg, 0, 0 );
-//      image( userImg, 0, 0 );
-//      lastUserImg = userImg;
-//      brightness
-//      //filter( THRESHOLD, 0.9 );
-//    }
-//    else {
-//      background(0);
-//    }
     
-    // This will black and white the i,age
+    // This will black and white the image
     opencv.threshold(threshold);
     
     //Blob[] blobs = opencv.blobs( 100, width*height/3, 20, true );
@@ -165,13 +159,12 @@ void draw() {
     // The ghost users
     if (showImage) {
       opencv.copy( lastUserImg );
-      cv2.blur( OpenCV.BLUR, 3 );
+      //opencv.blur( OpenCV.BLUR, 3 );
       opencv.brightness( 100 );
       opencv.contrast( 80);
       image( opencv.image(), 0, 0 );
       image( ghostImage, 0, 0 );
       lastUserImg = ghostImage;
-      //filter( THRESHOLD, 0.9 );
     }
     else {
       background(0);
@@ -243,8 +236,10 @@ void draw() {
     }
 
     // Remember the image to use for the next absDiff
-    opencv.copy( captureImage );
-    opencv.remember(1);
+    if (ps3cam) {
+      opencv.copy( captureImage );
+      opencv.remember(1);
+    }
 }
 
 public void stop() {
@@ -278,30 +273,15 @@ void setRandomLayers() {
   for ( int i=0; i<numLayers; i++) {
     layers[randomLayer()].show(); 
   }
-  //toggleRandomAudioLayers();
 }
-
-// Old sound random, keeps one on.
-void toggleRandomAudioLayers() {
-  for ( int i=0; i<audioLayers.length; i++ ) {
-    audioLayers[i].hide();
-  }
-  int numLayers = (int)random(1,3);
-  println("num audio layers" + numLayers);
-  for ( int i=0; i<numLayers; i++) {
-    audioLayers[(int)random( 0, audioLayers.length )].show(); 
-  }
-}
-
 
 void mouseDragged() {
     threshold = int( map(mouseX,0,width,0,255) );
     println( "threshold:" + threshold );
 }
 
-void mousePressed() {
-    background(bgcol);
-}
+//void mousePressed() {
+//}
 
 void keyPressed() {
   if (key == 'b') {
@@ -340,9 +320,6 @@ void keyPressed() {
     for ( int i=1; i<layers.length; i++ ) {
       layers[i].visible = false;
     }
-  }
-  else if (key == 'z') {
-    toggleRandomAudioLayers();
   }
   else if (key == 'n' ) {
     audioLayers[0].show();
