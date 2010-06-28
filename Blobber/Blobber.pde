@@ -7,7 +7,7 @@ OpenCV opencv;
 
 int w = 640;
 int h = 480;
-boolean ps3cam = false;
+boolean ps3cam = true;
 int threshold = 40;
 int numBlobs = 16;
 boolean detectHoles = true;
@@ -20,7 +20,7 @@ boolean showImage = true;
 int framesUntilChange = 30;
 int frameChangeCounter = 0;
 int timeSinceBlob =0 , delayForSound=10;
-boolean interactif;
+boolean interactif = false;
 
 PFont font;
 
@@ -68,6 +68,7 @@ void setup() {
     audioLayers[j++] = new Noizer();
     audioLayers[j++] = new FModer();
     gbGran = new BackgroundGranulation();
+    gbGran.setup();
     
     println("Setting up layers");
     for ( int i=0; i<layers.length; i++ ) {
@@ -82,7 +83,7 @@ void setup() {
 
     if ( ps3cam ) {
       capture = new Capture( this, width, height, 30 );
-      capture.settings();
+      //capture.settings();
     }
 }
 
@@ -102,61 +103,61 @@ void draw() {
       opencv.read();
     }
     //opencv.flip( OpenCV.FLIP_HORIZONTAL );
-    //PImage rememberImage = opencv.image(); // Will use after absDiff to set image for diff next frame
+    PImage rememberImage = opencv.image(); // Will use after absDiff to set image for diff next frame
    
     //opencv.invert();
     opencv.absDiff();               // Calculates the absolute difference
-        opencv.remember();
-        opencv.flip( OpenCV.FLIP_HORIZONTAL );
+    //opencv.remember();
+    //opencv.flip( OpenCV.FLIP_HORIZONTAL );
 
     opencv.convert( OpenCV.GRAY );  // Converts the difference image to greyscale
-    opencv.blur( OpenCV.BLUR, 3 );  // I like to blur before taking the difference image to reduce camera noise
+    //opencv.blur( OpenCV.BLUR, 3 );  // I like to blur before taking the difference image to reduce camera noise
 
     // The ghost users
     if (showImage) {
-      image( opencv.image(), 0, 0 );
+      PImage userImg = opencv.image();
+      image( userImg, 0, 0 );
+      //filter( THRESHOLD, 0.9 );
     }
     else {
       background(0);
     }
- 
+    
     // This will black and white the i,age
     opencv.threshold(threshold);
-
+ 
     //Blob[] blobs = opencv.blobs( 100, width*height/3, 20, true );
     Blob[] blobs = opencv.blobs( minBlobSize, width*height/3, numBlobs, detectHoles );
     
     // Dave's sound state changer and variable?
-    if(blobs.length == 0 && interactif == false){
+    if(blobs.length < 5 && interactif == true){
      timeSinceBlob ++;
     }
     
     // check if we had no blobz, turn annoying noisez off and 
     if(timeSinceBlob == delayForSound){
     // turn off both interactive noises
-     gbGran.hide();
-     gbGran.hide();
+     audioLayers[0].hide();
+     audioLayers[1].hide();
      
     // turn on soundscape, set variable
     gbGran.show();
     interactif = false;
     println("Non - interactive mode!");
+    timeSinceBlob = 0;
     
     }
     
-    
     if(blobs.length > 0 && interactif == false) {
     // turn on both interactive noises
-     gbGran.show();
-     gbGran.show();
+     audioLayers[0].show();
+     audioLayers[1].show();
      
     // turn off soundscape, set variable
     gbGran.hide();
     interactif = true;
     println("Interactive mode!");
     }
-    
-    
     
     frameChangeCounter++;
     if ( frameChangeCounter >= framesUntilChange ) {
@@ -185,8 +186,8 @@ void draw() {
     if ( blurAmount > 0 ) filter( BLUR, blurAmount );
 
     // Remember the image to use for the next absDiff
-    //opencv.copy( rememberImage );
-    //opencv.remember(1);
+    opencv.copy( rememberImage );
+    opencv.remember(1);
 }
 
 public void stop() {
