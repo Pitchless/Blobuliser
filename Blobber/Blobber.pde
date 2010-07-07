@@ -46,7 +46,7 @@ boolean interactif = false;
 
 OpenCV opencv;
 
-Layer[] layers;
+Stack layers = new Stack();
 Layer[] audioLayers;
 
 Capture capture;
@@ -80,30 +80,29 @@ void setup() {
     println( "Drag mouse inside sketch window to change threshold" );
  
     // Create all the effect layers we will use   
-    int j = 0;
-    layers = new Layer[19];
-    layers[j++] = new BlobTracker();
-    layers[j++] = new Filler(1);
-    layers[j++] = new BigRaver(true, 0.986);
-    layers[j++] = new Filler2(1);
-    layers[j++] = new Filler2(2);
-    layers[j++] = new Shapes2(1,0.9999999); // square    
-    layers[j++] = new Shapes2(2,0.9999999); // circle    
-    layers[j++] = new Shapes2(1,0.998); // square
-    layers[j++] = new Shapes2(2,0.996); // circle
-    layers[j++] = new Shapes2(1,0.68); // square
-    layers[j++] = new Shapes2(2,0.72); // circle
-    layers[j++] = new Shapes(1,0.9); // square
-    layers[j++] = new Shapes(2,0.8); // circle
-    layers[j++] = new Shapes(1,0.1); // square
-    layers[j++] = new Shapes(2,0.2); // circle
-    layers[j++] = new CatsCradle();
-    layers[j++] = new NextManLines();
-    layers[j++] = new BigRaver();
-    layers[j++] = new BigRaver(true);
+    layers.add( new BlobTracker() );
+    layers.add( new Filler(1) );
+    layers.add( new BigRaver(true, 0.986) );
+    layers.add( new Filler2(1) );
+    layers.add( new Filler2(2) );
+    layers.add( new Shapes2(1,0.9999999) ); // square
+    layers.add( new Shapes2(2,0.9999999) ); // circle
+    layers.add( new Shapes2(1,0.998) );     // square
+    layers.add( new Shapes2(2,0.996) );     // circle
+    layers.add( new Shapes2(1,0.68) );      // square
+    layers.add( new Shapes2(2,0.72) );      // circle
+    layers.add( new Shapes(1,0.9) );        // square
+    layers.add( new Shapes(2,0.8) );        // circle
+    layers.add( new Shapes(1,0.1) );        // square
+    layers.add( new Shapes(2,0.2) );        // circle
+    layers.add( new CatsCradle() );
+    layers.add( new NextManLines() );
+    layers.add( new BigRaver() );
+    layers.add( new BigRaver(true) );
+    layers.show();
 
     // and the audio layers
-    j = 0;
+    int j = 0;
     audioLayers = new Layer[2];
     audioLayers[j++] = new Noizer();
     audioLayers[j++] = new FModer();
@@ -112,10 +111,9 @@ void setup() {
     
     // Setup all the crap we created above
     println("Setting up layers");
-    for ( int i=0; i<layers.length; i++ ) {
-      layers[i].setup();
-    }
-    println("Setup " + layers.length + " video layers");
+    layers.setup();
+    println("Setup " + layers.size() + " video layers");
+    
     for ( int i=0; i<audioLayers.length; i++ ) {
       audioLayers[i].setup();
     }
@@ -230,11 +228,7 @@ void draw() {
     }
  
     // Draw all visible layers   
-    for ( int i=0; i<layers.length; i++ ) {
-      if ( layers[i].visible ) {
-        layers[i].draw( blobs );
-      }
-    }
+    layers.draw( blobs );
     
     // Draw all audio layers   
     for ( int i=0; i<audioLayers.length; i++ ) {
@@ -265,31 +259,21 @@ public void stop() {
     super.stop();
 }
 
-void toggleLayer( int layerOn ) {
-  for ( int i=0; i<layers.length; i++ ) {
-    Layer layer = layers[i];
-    println("toggle layer:" + layerOn);
-    if ( i==layerOn ) { layer.show(); } else { layer.hide(); } 
-  }
-}
-
 int randomLayer() {
-    int layerOn = (int)random( 1, layers.length );
+    int layerOn = (int)random( 1, layers.size() );
     return layerOn;
 }
 
 void toggleRandomLayer() {
-    toggleLayer( randomLayer() );
+    layers.toggle( randomLayer() );
 }
 
 void setRandomLayers() {
-  for ( int i=0; i<layers.length; i++ ) {
-    layers[i].hide();
-  }
+  layers.hideAll();
   int numLayers = (int)random(1,3);
   println("num layers" + numLayers);
   for ( int i=0; i<numLayers; i++) {
-    layers[randomLayer()].show(); 
+    layers.get(randomLayer()).show();
   }
 }
 
@@ -297,9 +281,7 @@ void setRandomLayers() {
 void randomOff() {
     beRandom = false;
     uiBeRandom.changeValue(0.0);
-    for ( int i=1; i<layers.length; i++ ) {
-      layers[i].visible = false;
-    }
+    layers.hideAll();
 }
 void randomOn() {
     beRandom = true;
@@ -333,12 +315,11 @@ void keyPressed() {
     i -= 49;
     //i += 1;
     println( "Toggle layer " + i );
-    if ( i > layers.length ) {
+    if ( i > layers.size() ) {
       println("Layer " + i + " does not exist");
     }
     else {
-      //layers[i-1].toggleVisible();
-      if ( layers[i-1].visible ) { layers[i-1].hide(); } else { layers[i-1].show(); }
+      layers.toggle( i-1 );
       background(0);
     }
   }
