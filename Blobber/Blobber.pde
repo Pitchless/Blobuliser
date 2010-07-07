@@ -46,8 +46,8 @@ boolean interactif = false;
 
 OpenCV opencv;
 
-Stack layers = new Stack();
-Layer[] audioLayers;
+Stack layers      = new Stack();
+Stack audioLayers = new Stack();
 
 Capture capture;
 PImage captureImage; // Stash the image after capture
@@ -102,24 +102,20 @@ void setup() {
     layers.show();
 
     // and the audio layers
-    int j = 0;
-    audioLayers = new Layer[2];
-    audioLayers[j++] = new Noizer();
-    audioLayers[j++] = new FModer();
+    audioLayers.add( new Noizer() );
+    audioLayers.add( new FModer() );
+    audioLayers.show();
     gbGran = new BackgroundGranulation();
     gbGran.setup();
     
     // Setup all the crap we created above
     println("Setting up layers");
     layers.setup();
-    println("Setup " + layers.size() + " video layers");
-    
-    for ( int i=0; i<audioLayers.length; i++ ) {
-      audioLayers[i].setup();
-    }
-    println("Setup " + audioLayers.length + " audio layers");
     toggleRandomLayer();
-
+    audioLayers.setup();
+    println("Setup " + layers.size() + " video layers");
+    println("Setup " + audioLayers.size() + " audio layers");
+    
     if ( ps3cam ) {
       capture = new Capture( this, width, height, 30 );
       //capture.settings();
@@ -195,8 +191,7 @@ void draw() {
       // check if we had no blobz, turn annoying noisez off and 
       if(timeSinceBlob == delayForSound){
         // turn off both interactive noises
-        audioLayers[0].hide();
-        audioLayers[1].hide();
+        audioLayers.hideAll();
   
         // turn on soundscape, set variable
         gbGran.setSamples();
@@ -204,12 +199,17 @@ void draw() {
         interactif = false;
         println("Non - interactive mode!");
         timeSinceBlob = 0;
-  
       }
 
       if(blobs.length > 0 && interactif == false) {
         // turn on both interactive noises
-        if ( soundFlipFlop ) { audioLayers[0].show();audioLayers[1].hide(); } else { audioLayers[1].show(); audioLayers[0].hide();}
+        if ( soundFlipFlop ) {
+          audioLayers.get(0).show();
+          audioLayers.get(1).hide();
+        } else {
+          audioLayers.get(1).show();
+          audioLayers.get(0).hide();
+        }
         soundFlipFlop = !soundFlipFlop;
   
         // turn off soundscape, set variable
@@ -227,16 +227,9 @@ void draw() {
       }
     }
  
-    // Draw all visible layers   
+    // Draw layers   
     layers.draw( blobs );
-    
-    // Draw all audio layers   
-    for ( int i=0; i<audioLayers.length; i++ ) {
-      if ( audioLayers[i].visible ) {
-        audioLayers[i].draw( blobs );
-      }
-    }
-    
+    audioLayers.draw( blobs );    
     gbGran.draw(blobs);
     
     if ( blurAmount > 0 ) {
@@ -330,16 +323,16 @@ void keyPressed() {
     randomOff();
   }
   else if (key == 'n' ) {
-    audioLayers[0].show();
+    audioLayers.get(0).show();
   }
   else if (key == 'N' ) {
-    audioLayers[0].hide();
+    audioLayers.get(0).hide();
   }
   else if (key == 'm' ) {
-    audioLayers[1].show();
+    audioLayers.get(1).show();
   }
   else if (key == 'M' ) {
-    audioLayers[1].hide();
+    audioLayers.get(1).hide();
   }
 }
 
