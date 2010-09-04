@@ -14,7 +14,7 @@ int h = 480;
 // Some cams give mirror image
 boolean flipCam = true;
 // Use ps3 eye cam hack, read via processing and pass to opencv
-boolean ps3cam = false;
+boolean ps3cam = true;
 
 // OpenCV blob detection settings
 int threshold = 60;
@@ -59,6 +59,7 @@ boolean soundFlipFlop;
 
 ControlP5 ui;
 Toggle uiBeRandom;
+Toggle uiShowTracking;
 
 void setup() {
     size( w, h );
@@ -76,8 +77,6 @@ void setup() {
        
     PFont font = loadFont( "AndaleMono.vlw" );
     textFont( font );
-
-    println( "Drag mouse inside sketch window to change threshold" );
  
     // Create all the effect layers we will use   
     layers.add( new BlobTracker() );
@@ -134,6 +133,7 @@ void setup() {
     ui.addSlider("minBlobSize",0,100,10,height-50,100,14);
     ui.addToggle("detectHoles",10,height-30,14,14);
     uiBeRandom = ui.addToggle("uiBeRandom",true,80,height-30,14,14); // Bound to meth below.
+    uiShowTracking = ui.addToggle("uiShowTracking",false,150,height-30,14,14); // Bound to meth below.
 }
 
 
@@ -282,6 +282,16 @@ void randomOn() {
     toggleRandomLayer();
 }
 
+// Turn tracking layer on and off keeping the UI in sync
+void showTracking() {
+    uiShowTracking.changeValue(1.0);
+    layers.get(0).show();
+}
+void hideTracking() {
+    uiShowTracking.changeValue(0.0);
+    layers.get(0).hide();
+}
+
 void keyPressed() {
   // Hide/Show UI and cursor with tab key
   if ( key == '\t' ) {
@@ -339,5 +349,10 @@ void keyPressed() {
 // Called from UI button
 void uiBeRandom(boolean val) {
   if (val) { randomOn(); } else { randomOff(); }
+}
+
+// Called from UI button
+void uiShowTracking(boolean val) {
+  if (val) { showTracking(); } else { hideTracking(); }
 }
 
