@@ -46,8 +46,8 @@ boolean interactif = false;
 
 OpenCV opencv;
 
-Stack layers      = new Stack();
-Stack audioLayers = new Stack();
+Group layers      = new Group();
+Group audioLayers = new Group();
 
 Capture capture;
 PImage captureImage; // Stash the image after capture

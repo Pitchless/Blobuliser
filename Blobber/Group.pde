@@ -2,11 +2,11 @@
  * A group/stack of Layers.
  */
 
-class Stack extends Layer {
+class Group extends Layer {
 
   ArrayList layers;
 
-  Stack() {
+  Group() {
     layers = new ArrayList();
   }
   
