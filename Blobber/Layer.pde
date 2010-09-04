@@ -26,6 +26,7 @@ class Layer {
   }
   
   void setup() {
+    name = this.getClass().getName();
     println( "Setup Layer: " + name );
     setRandomColor();
   }
