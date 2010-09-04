@@ -80,10 +80,8 @@ void setup() {
  
     // Create all the effect layers we will use   
     layers.add( new BlobTracker() );
-    layers.add( new Filler(1) );
+
     layers.add( new BigRaver(true, 0.986) );
-    layers.add( new Filler2(1) );
-    layers.add( new Filler2(2) );
     layers.add( new Shapes2(1,0.9999999) ); // square
     layers.add( new Shapes2(2,0.9999999) ); // circle
     layers.add( new Shapes2(1,0.998) );     // square
