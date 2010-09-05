@@ -1,4 +1,4 @@
-class NextManLines extends Layer {
+class NextManLines extends ImgLayer {
   
   void draw( Blob blobs[] ) {
     fade(0.8);
@@ -18,7 +18,7 @@ class NextManLines extends Layer {
        img.line( blob1.x, blob1.y, blob2.x, blob2.y );
     }
     img.endDraw();
-    image( img, 0, 0 );
+    super.draw(blobs);
   }
 
 }

@@ -2,7 +2,7 @@
  * Horizontal or Vertical Lines Layer 2
  * Updated to also sort other way when drawing to get straighter lines.
  */
-class SLines2 extends Layer {
+class SLines2 extends ImgLayer {
 
   static final int HORI = 1;
   static final int VERT = 2;
@@ -49,7 +49,7 @@ class SLines2 extends Layer {
       drawJoinedBlobs(splitBlobs[0], splitBlobs[1]);
     }
     img.endDraw();
-    image( img, 0, 0 );
+    super.draw(blobs);
   }
 
   // Given an array of blobs, sorts that array and then splits into 2 halfs and sort those halfs.

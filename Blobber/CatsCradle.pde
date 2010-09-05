@@ -1,4 +1,4 @@
-class CatsCradle extends Layer {
+class CatsCradle extends ImgLayer {
 
   Boolean   isCentered   = false;
   Float     fadePerFrame = 0.5;
@@ -23,7 +23,7 @@ class CatsCradle extends Layer {
       }
     }
     img.endDraw();
-    image( img, 0, 0 );
+    super.draw(blobs);
   }
 
 }

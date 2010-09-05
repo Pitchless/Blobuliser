@@ -1,4 +1,4 @@
-class Shapes2 extends Layer {
+class Shapes2 extends ImgLayer {
 
   int       drawShape    = 1; // 1=square 2=circle
   Boolean   isCentered   = false;
@@ -53,7 +53,7 @@ class Shapes2 extends Layer {
       }
     }
     img.endDraw();
-    image( img, 0, 0 );
+    super.draw(blobs);
   }
 
 }

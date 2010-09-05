@@ -1,7 +1,7 @@
 /*
  * Horizontal or Vertical Lines Layer
  */
-class SLines extends Layer {
+class SLines extends ImgLayer {
 
   static final int HORI = 1;
   static final int VERT = 2;
@@ -48,7 +48,7 @@ class SLines extends Layer {
       drawLines(sortedBlobs);
     }
     img.endDraw();
-    image( img, 0, 0 );
+    super.draw(blobs);
   }
 
   void drawLines(Blob blobs[]) {

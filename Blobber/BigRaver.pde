@@ -2,7 +2,7 @@
  * Draw lines out from a central point to all the blob centers.
  * Central point is either the center of the screen of the first blob.
  */
-class BigRaver extends Layer {
+class BigRaver extends ImgLayer {
 
   Boolean   isCentered   = false;
   Float     fadePerFrame = 0.90;
@@ -42,7 +42,7 @@ class BigRaver extends Layer {
       }
       img.endDraw();
     }
-    image( img, 0, 0 );
+    super.draw(blobs);
   }
 
 }
