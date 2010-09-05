@@ -66,8 +66,8 @@ class SLines extends Layer {
          img.stroke(fgcol, 160);
          img.line( blob1.x, blob1.y, blob2.x, blob2.y );
          img.strokeWeight(1);
-         img.line( blob1.x, blob1.y, blob2.x, blob2.y );
          img.stroke(fgcol);
+         img.line( blob1.x, blob1.y, blob2.x, blob2.y );
       }
   }
 
