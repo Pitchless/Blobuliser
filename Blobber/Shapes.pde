@@ -22,7 +22,7 @@ class Shapes extends Layer {
     img = createGraphics( width, height, P3D );
   }
   
-  Boolean draw( Blob blobs[] ) {
+  void draw( Blob blobs[] ) {
     fade( fadePerFrame );
     cycleColor();
 
@@ -47,7 +47,6 @@ class Shapes extends Layer {
     }
     img.endDraw();
     image( img, 0, 0 );
-    return true;
   }
 
 }

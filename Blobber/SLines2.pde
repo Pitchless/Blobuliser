@@ -38,7 +38,7 @@ class SLines2 extends Layer {
     img = createGraphics( width, height, P3D );
   }
   
-  Boolean draw( Blob blobs[] ) {
+  void draw( Blob blobs[] ) {
     fade(0.9);
     cycleColor();
     // shallow copy so we don't effact the order for other layers
@@ -55,7 +55,6 @@ class SLines2 extends Layer {
     }
     img.endDraw();
     image( img, 0, 0 );
-    return true;
   }
 
   // Given an array of blobs, sorts that array and then splits into 2 halfs and sort those halfs.

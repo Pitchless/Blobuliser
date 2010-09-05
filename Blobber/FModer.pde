@@ -62,7 +62,7 @@ class FModer extends Layer {
     ac.start();
   }
 
-  Boolean draw( Blob[] blobs ) {
+  void draw( Blob[] blobs ) {
     
     
     // sound modulation stuff
@@ -79,7 +79,6 @@ class FModer extends Layer {
       // modFreqRatio2.setValue(myY);
     }
 
-    return true;
   }
   
   void hide() {

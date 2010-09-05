@@ -5,7 +5,7 @@ class NextManLines extends Layer {
     img = createGraphics( width, height, P3D );
   }
   
-  Boolean draw( Blob blobs[] ) {
+  void draw( Blob blobs[] ) {
     fade(0.8);
     cycleColor();
 
@@ -24,7 +24,6 @@ class NextManLines extends Layer {
     }
     img.endDraw();
     image( img, 0, 0 );
-    return true;
   }
 
 }

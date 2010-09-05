@@ -71,15 +71,13 @@ class BackgroundGranulation extends Layer {
     ac.start();
   }
 
-  Boolean draw( Blob[] blobs ) {
+  void draw( Blob[] blobs ) {
     timeSinceStart ++;
 
     if(timeSinceStart > 100){
       // setSamples();
       timeSinceStart =0;
     }
-    return true;
-
   }
 
   // this is how we pull all of the audio files out of the data folder

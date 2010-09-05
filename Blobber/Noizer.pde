@@ -54,7 +54,7 @@ class Noizer extends Layer {
   
   }
   
-  Boolean draw( Blob[] blobs ) {
+  void draw( Blob[] blobs ) {
     if ( !visible ) return false;
     
     // sound modulation stuff
@@ -69,9 +69,7 @@ class Noizer extends Layer {
       modulatorLR.setValue(myX);
       modulatorUD.setValue(myY);
       //freqModulator.setValue(myFM);
-    }
-    
-    return true;
+    }    
   }
   
   void hide() {

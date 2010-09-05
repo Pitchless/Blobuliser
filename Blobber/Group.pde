@@ -52,12 +52,11 @@ class Group extends Layer {
     }
   }
 
-  Boolean draw( Blob[] blobs ) {
-    if ( !visible) return false; 
+  void draw( Blob[] blobs ) {
+    if ( !visible) return; 
     for ( int i=0; i<layers.size(); i++ ) {
       Layer layer = (Layer)layers.get(i);
       if ( layer.visible ) layer.draw(blobs);
     }
-    return true;
   }
 }

@@ -1,9 +1,9 @@
-/*
+/**
  * Layer to display info on the blobs detected.
  */
 class BlobTracker extends Layer {
 
-  Boolean draw( Blob[] blobs ) {
+  void draw( Blob[] blobs ) {
     for( int i=0; i<blobs.length; i++ ) {
       Rectangle bounding_rect	= blobs[i].rectangle;
       float area = blobs[i].area;
@@ -24,7 +24,6 @@ class BlobTracker extends Layer {
       rect( bounding_rect.x, bounding_rect.y, bounding_rect.width, bounding_rect.height );
       ellipse( centroid.x, centroid.y, 20, 20 );   
     }
-    return true;
   }
 
 }

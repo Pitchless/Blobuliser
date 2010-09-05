@@ -31,8 +31,7 @@ class Layer {
     setRandomColor();
   }
   
-  Boolean draw( Blob[] blobs ) {
-    return false; // We didn't render anything
+  void draw( Blob[] blobs ) {
   }
   
   void fade( float amt ) {

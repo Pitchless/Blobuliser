@@ -31,7 +31,7 @@ class Shapes2 extends Layer {
     super.show();
   }
   
-  Boolean draw( Blob blobs[] ) {
+  void draw( Blob blobs[] ) {
     if(flipFlop) fade( fadePerFrame );
     flipFlop = flipFlop ? false : true;
     cycleColor();
@@ -59,7 +59,6 @@ class Shapes2 extends Layer {
     }
     img.endDraw();
     image( img, 0, 0 );
-    return true;
   }
 
 }

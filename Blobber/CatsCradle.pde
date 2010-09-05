@@ -11,7 +11,7 @@ class CatsCradle extends Layer {
     img = createGraphics( width, height, P3D );
   }
   
-  Boolean draw( Blob blobs[] ) { 
+  void draw( Blob blobs[] ) { 
     img.beginDraw();
     img.background(0,0,0,0);
 
@@ -29,7 +29,6 @@ class CatsCradle extends Layer {
     }
     img.endDraw();
     image( img, 0, 0 );
-    return true;
   }
 
 }
