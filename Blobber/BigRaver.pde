@@ -35,7 +35,11 @@ class BigRaver extends ImgLayer {
          Point blob1 = blobs[i].centroid;
          colorMode(HSB);
          color linecol = color( hue(fgcol), 255, 255, 200 );
-         colorMode(RGB);         
+         colorMode(RGB);
+
+         img.strokeWeight(3);
+         img.stroke(linecol, 160);
+         img.line( raver.x, raver.y , blob1.x, blob1.y );
          img.strokeWeight(1);
          img.stroke(linecol);
          img.line( raver.x, raver.y , blob1.x, blob1.y );
