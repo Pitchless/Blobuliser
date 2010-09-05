@@ -46,36 +46,39 @@ class SLines2 extends Layer {
 
     img.beginDraw();
     if ((direction & HORI)==HORI) {
-      Arrays.sort(sortedBlobs, XSort);
-      int len = blobs.length % 2 == 0 ? blobs.length : blobs.length -1;
-      int half = len / 2;
-      Blob lefts[]  = new Blob[half];
-      Blob rights[] = new Blob[half];
-      for (int i=0; i<half; i++) {
-        lefts[i]  = sortedBlobs[i];
-        rights[i] = sortedBlobs[i+half];
-      }
-      Arrays.sort(lefts, YSort);
-      Arrays.sort(rights, YSort);
-      drawJoinedBlobs(lefts, rights);
+        Blob splitBlobs[][] = splitSort(sortedBlobs, XSort, YSort);
+        drawJoinedBlobs(splitBlobs[0], splitBlobs[1]);
     }
     if ((direction & VERT)==VERT) {
-      Arrays.sort(sortedBlobs, YSort);
-      int len = blobs.length % 2 == 0 ? blobs.length : blobs.length -1;
-      int half = len / 2;
-      Blob tops[]    = new Blob[half];
-      Blob bottoms[] = new Blob[half];
-      for (int i=0; i<half; i++) {
-        tops[i]    = sortedBlobs[i];
-        bottoms[i] = sortedBlobs[i+half];
-      }
-      Arrays.sort(tops, XSort);
-      Arrays.sort(bottoms, XSort);
-      drawJoinedBlobs(tops, bottoms);
+      Blob splitBlobs[][] = splitSort(sortedBlobs, YSort, XSort);
+      drawJoinedBlobs(splitBlobs[0], splitBlobs[1]);
     }
     img.endDraw();
     image( img, 0, 0 );
     return true;
+  }
+
+  // Given an array of blobs, sorts that array and then splits into 2 halfs and sort those halfs.
+  // Returns 2 element array containing the arrays for each half.
+  // e.g. Blob splitBlobs[][] = splitSort(blobs, XSort, YSort);
+  // Sort all the blobs based on x (left to right) then split (left side blobs and right side blobs),
+  // then sort those blobs on y (top to bottom).
+  Blob[][] splitSort(Blob blobs[], Comparator sort1, Comparator sort2) {
+    Arrays.sort(blobs, sort1);
+    int len = blobs.length % 2 == 0 ? blobs.length : blobs.length -1;
+    int half = len / 2;
+    Blob blobs1[] = new Blob[half];
+    Blob blobs2[] = new Blob[half];
+    for (int i=0; i<half; i++) {
+      blobs1[i] = blobs[i];
+      blobs2[i] = blobs[i+half];
+    }
+    Arrays.sort(blobs1, sort2);
+    Arrays.sort(blobs2, sort2);
+    Blob out[][] = new Blob[2][];
+    out[0] = blobs1;
+    out[1] = blobs2;
+    return out;
   }
 
   void drawJoinedBlobs(Blob b1[], Blob b2[]) {
