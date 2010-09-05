@@ -55,7 +55,7 @@ class Noizer extends Layer {
   }
   
   void draw( Blob[] blobs ) {
-    if ( !visible ) return false;
+    if ( !visible ) return;
     
     // sound modulation stuff
     float myX, myY, myFM;
