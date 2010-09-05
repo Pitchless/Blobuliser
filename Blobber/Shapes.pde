@@ -2,7 +2,7 @@ class Shapes extends Layer {
 
   int       drawShape    = 1; // 1=square 2=circle
   Boolean   isCentered   = false;
-  Float     fadePerFrame = 0.90;
+  float     fadePerFrame = 0.90;
   float     scaleRatio   = 0.7;
   float     rotation     = 0;
 
@@ -29,8 +29,6 @@ class Shapes extends Layer {
     img.beginDraw();
     img.rectMode(CENTER);
     img.ellipseMode(CENTER);
-    //img.translate( width/2, height/2 );
-    //img.rotate(PI/3.0);
 
     for( int i=0; i < blobs.length; i++ ) {
       Point blob = blobs[i].centroid;
@@ -38,15 +36,11 @@ class Shapes extends Layer {
       img.noFill();
       img.stroke( fgcol );
       img.strokeWeight(2);
-      //img.translate( blob.x, blob.y );
-      //img.rotate( radians(rotation) );
       switch ( drawShape ) {
         case 1:
-          //img.rect( 0, 0, size, size );
           img.rect( blob.x, blob.y, size, size );
         break;
         case 2:
-          //img.ellipse( 0, 0, size, size );
           img.ellipse( blob.x, blob.y, size, size );
         break;
       }
