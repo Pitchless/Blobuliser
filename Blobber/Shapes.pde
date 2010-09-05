@@ -17,11 +17,6 @@ class Shapes extends Layer {
     this.scaleRatio = scaleRatio;
   }
   
-  void setup() {
-    super.setup();
-    img = createGraphics( width, height, P3D );
-  }
-  
   void draw( Blob blobs[] ) {
     fade( fadePerFrame );
     cycleColor();

@@ -18,11 +18,6 @@ class Shapes2 extends Layer {
     this.drawShape    = drawShape;
     this.fadePerFrame = fadePerFrame;
   }
-  
-  void setup() {
-    super.setup();
-    img = createGraphics( width, height, P3D );
-  }
  
   void show() {
     size = 5 + random(0,25);

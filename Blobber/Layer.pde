@@ -5,7 +5,7 @@ class Layer {
   
   Boolean   visible = false; 
   String    name = "";
-  PGraphics img;
+  PGraphics img = createGraphics( width, height, P3D );
   color     fgcol = color(255,255,0);
   int       hCycle;
   
@@ -32,6 +32,7 @@ class Layer {
   }
   
   void draw( Blob[] blobs ) {
+    //image( img, 0, 0 );
   }
   
   void fade( float amt ) {

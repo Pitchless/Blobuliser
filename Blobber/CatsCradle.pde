@@ -6,11 +6,6 @@ class CatsCradle extends Layer {
   CatsCradle() {
   }
   
-  void setup() {
-    super.setup();
-    img = createGraphics( width, height, P3D );
-  }
-  
   void draw( Blob blobs[] ) { 
     img.beginDraw();
     img.background(0,0,0,0);

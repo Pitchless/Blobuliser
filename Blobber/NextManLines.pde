@@ -1,10 +1,5 @@
 class NextManLines extends Layer {
   
-  void setup() {
-    super.setup();
-    img = createGraphics( width, height, P3D );
-  }
-  
   void draw( Blob blobs[] ) {
     fade(0.8);
     cycleColor();

@@ -32,11 +32,6 @@ class SLines extends Layer {
     this.direction = direction;
   }
   
-  void setup() {
-    super.setup();
-    img = createGraphics( width, height, P3D );
-  }
-  
   void draw( Blob blobs[] ) {
     fade(0.9);
     cycleColor();
