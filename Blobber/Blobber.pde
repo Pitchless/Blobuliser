@@ -60,6 +60,7 @@ boolean soundFlipFlop;
 ControlP5 ui;
 Toggle uiBeRandom;
 Toggle uiShowTracking;
+Textfield uiFrameRate;
 
 void setup() {
     size( w, h );
@@ -134,6 +135,7 @@ void setup() {
     ui.addToggle("detectHoles",10,height-30,14,14);
     uiBeRandom = ui.addToggle("uiBeRandom",true,80,height-30,14,14); // Bound to meth below.
     uiShowTracking = ui.addToggle("uiShowTracking",false,150,height-30,14,14); // Bound to meth below.
+    uiFrameRate = ui.addTextfield("FPS",width-60,height-30,50,14);
 }
 
 
@@ -244,6 +246,11 @@ void draw() {
     if (ps3cam) {
       opencv.copy( captureImage );
       opencv.remember(1);
+    }
+
+    // Per frame UI updates if the ui is showing
+    if (ui.isVisible()) {
+      uiFrameRate.setText(str(frameRate));
     }
 }
 
