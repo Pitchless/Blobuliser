@@ -1,7 +1,12 @@
+/**
+ * Draw lines out from a central point to all the blob centers.
+ * Central point is either the center of the screen of the first blob.
+ */
 class BigRaver extends Layer {
 
   Boolean   isCentered   = false;
   Float     fadePerFrame = 0.90;
+  Point     raver        = new Point( width/2, height/2 );
   
   BigRaver() {
   }
@@ -23,26 +28,14 @@ class BigRaver extends Layer {
   Boolean draw( Blob blobs[] ) {
     fade( fadePerFrame );
     cycleColor();
-
     if ( blobs.length > 0 ) {
-      int len;
-      if ( blobs.length % 2 == 0 ) {
-        len = blobs.length;
-      }
-      else {
-        len = blobs.length - 1;
-      }
-      Point raver;
       int start = 0;
-      if ( isCentered ) {
-            raver = new Point( width/2, height/2 );
-      }
-      else {
+      if ( !isCentered ) {
         raver = blobs[0].centroid;
         start = 1;
       }
       img.beginDraw();
-      for( int i=start; i<len; i++ ) {
+      for( int i=start; i<blobs.length; i++ ) {
          if ( i % 5 == 0 ) cycleColor();
          Point blob1 = blobs[i].centroid;
          colorMode(HSB);
