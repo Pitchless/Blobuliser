@@ -62,11 +62,11 @@ class ImgLayer extends Layer {
   void fade( float amt ) {
     img.loadPixels();
     for ( int i=0; i<img.pixels.length; i++ ) {
-        // The functions red(), green(), and blue() pull out the 3 color components from a pixel.
-        float r = red(img.pixels[i]);
-        float g = green(img.pixels[i]);
-        float b = blue(img.pixels[i]);
-        float a = alpha(img.pixels[i]);
+        color argb = img.pixels[i];
+        int a = (argb >> 24) & 0xFF;
+        int r = (argb >> 16) & 0xFF;
+        int g = (argb >> 8) & 0xFF;
+        int b = argb & 0xFF;
         img.pixels[i] = color( r * amt, g * amt, b * amt, a * amt );
     }
     img.updatePixels();
