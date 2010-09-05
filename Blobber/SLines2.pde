@@ -59,6 +59,20 @@ class SLines2 extends Layer {
       Arrays.sort(rights, YSort);
       drawJoinedBlobs(lefts, rights);
     }
+    if ((direction & VERT)==VERT) {
+      Arrays.sort(sortedBlobs, YSort);
+      int len = blobs.length % 2 == 0 ? blobs.length : blobs.length -1;
+      int half = len / 2;
+      Blob tops[]    = new Blob[half];
+      Blob bottoms[] = new Blob[half];
+      for (int i=0; i<half; i++) {
+        tops[i]    = sortedBlobs[i];
+        bottoms[i] = sortedBlobs[i+half];
+      }
+      Arrays.sort(tops, XSort);
+      Arrays.sort(bottoms, XSort);
+      drawJoinedBlobs(tops, bottoms);
+    }
     img.endDraw();
     image( img, 0, 0 );
     return true;

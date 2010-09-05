@@ -81,6 +81,9 @@ void setup() {
  
     // Create all the effect layers we will use   
     layers.add( new BlobTracker() );
+    layers.add( new SLines2(SLines2.HORI) );
+    layers.add( new SLines2(SLines2.VERT) );
+    layers.add( new SLines2(SLines2.HORI|SLines2.VERT) ); // Both
     layers.add( new SLines(SLines.HORI) );
     layers.add( new SLines(SLines.VERT) );
     layers.add( new SLines(SLines.HORI|SLines.VERT) );  // Both. Nice :)
