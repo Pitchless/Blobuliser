@@ -61,15 +61,9 @@ class SLines2 extends ImgLayer {
   }
 
   void drawJoinedBlobs(Blob b1[], Blob b2[]) {
+    img.stroke(fgcol);
     for(int i=0; i<b1.length; i++) {
-         Point p1 = b1[i].centroid;
-         Point p2 = b2[i].centroid;
-         img.strokeWeight(3);
-         img.stroke(fgcol, 160);
-         img.line( p1.x, p1.y, p2.x, p2.y );
-         img.strokeWeight(1);
-         img.stroke(fgcol);    
-         img.line( p1.x, p1.y, p2.x, p2.y );
+      lazerLine(b1[i], b2[i]);
     }
   }
 
