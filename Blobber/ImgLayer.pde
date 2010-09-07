@@ -35,4 +35,25 @@ class ImgLayer extends Layer {
     img.updatePixels();
   }
 
+  /**
+   * Draw a lazer line between two blobs.
+   */
+  void lazerLine( Blob blob1, Blob blob2 ) {
+     Point p1 = blob1.centroid;
+     Point p2 = blob2.centroid;
+     lazerLine(p1.x, p1.y, p2.x, p2.y);
+  }
+
+  /**
+   * Draw a lazer line. Central line in stroke col with border lines at lower transparency.
+   */
+  void lazerLine( float x1, float y1, float x2, float y2 ) {
+     color col = img.strokeColor;
+     img.strokeWeight(3);
+     img.stroke(col, 160);
+     img.line( x1, y1, x2, y2 );
+     img.strokeWeight(1);
+     img.stroke(col);
+     img.line( x1, y1, x2, y2 );
+  }
 }
