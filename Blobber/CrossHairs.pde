@@ -4,14 +4,18 @@
 class CrossHairs extends ImgLayer {
 
   // Drop line col alphs to this
-  int   transparency = 200;
-  float fadePerFrame = 0.86;
+  int transparency = 200;
   
   CrossHairs() {
+    this.fadePerFrame = 0.86;
+  }
+
+  CrossHairs(float fadePerFrame) {
+    this.fadePerFrame = fadePerFrame;
   }
 
   void draw( Blob blobs[] ) {
-    fade( fadePerFrame );
+    fade();
     cycleColor();
     img.beginDraw();
     for( int i=0; i<blobs.length; i++ ) {
