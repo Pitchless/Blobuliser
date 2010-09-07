@@ -1,7 +1,11 @@
 class NextManLines extends ImgLayer {
   
+  NextManLines() {
+    this.fadePerFrame = 0.8;
+  }
+  
   void draw( Blob blobs[] ) {
-    fade(0.8);
+    fade();
     cycleColor();
 
     img.beginDraw();

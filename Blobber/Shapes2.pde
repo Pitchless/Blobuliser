@@ -2,16 +2,18 @@ class Shapes2 extends ImgLayer {
 
   int       drawShape    = 1; // 1=square 2=circle
   Boolean   isCentered   = false;
-  float     fadePerFrame = 0.9998;
   float     scaleRatio   = 0.7;
   float     size         = 10;
   int       weight       = 2;
   boolean   flipFlop     = true;
 
-  Shapes2() {}
+  Shapes2() {
+    this.fadePerFrame = 0.9998;  
+  }
   
   Shapes2( int drawShape ) {
     this.drawShape = drawShape;
+    this.fadePerFrame = 0.9998;
   }
 
   Shapes2( int drawShape, float fadePerFrame ) {
@@ -27,7 +29,7 @@ class Shapes2 extends ImgLayer {
   }
   
   void draw( Blob blobs[] ) {
-    if(flipFlop) fade( fadePerFrame );
+    if(flipFlop) fade();
     flipFlop = flipFlop ? false : true;
     cycleColor();
 

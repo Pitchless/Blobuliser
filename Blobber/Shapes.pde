@@ -10,15 +10,17 @@ class Shapes extends ImgLayer {
   
   Shapes( int drawShape ) {
     this.drawShape = drawShape;
+    this.fadePerFrame = 0.90;
   }
 
   Shapes( int drawShape, float scaleRatio ) {
     this.drawShape = drawShape;
     this.scaleRatio = scaleRatio;
+    this.fadePerFrame = 0.90;
   }
   
   void draw( Blob blobs[] ) {
-    fade( fadePerFrame );
+    fade();
     cycleColor();
 
     img.beginDraw();

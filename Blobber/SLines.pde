@@ -8,32 +8,16 @@ class SLines extends ImgLayer {
 
   int direction = HORI;
   
-  // Should be static but due to some Java inner class oddness it cant be
-  Comparator XSort = new Comparator() {
-      int compare(Object oa, Object ob) {
-        Point a = ((Blob)oa).centroid;
-        Point b = ((Blob)ob).centroid;
-        if (a.x == b.x) return 0;
-        return a.x < b.x ? -1 : 1;
-      }
-  };
-
-  // Should be static but due to some Java inner class oddness it cant be
-  Comparator YSort = new Comparator() {
-      int compare(Object oa, Object ob) {
-        Point a = ((Blob)oa).centroid;
-        Point b = ((Blob)ob).centroid;
-        if (a.y == b.y) return 0;
-        return a.y < b.y ? -1 : 1;
-      }
-  };
+  SLines() {
+    this.fadePerFrame = 0.9;
+  }
   
   SLines(int direction) {
     this.direction = direction;
+    this.fadePerFrame = 0.9;
   }
   
   void draw( Blob blobs[] ) {
-    fade(0.9);
     cycleColor();
     // shallow copy so we don't effact the order for other layers
     Blob sortedBlobs[] = (Blob[])blobs.clone();

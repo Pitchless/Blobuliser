@@ -4,14 +4,15 @@
  */
 class BigRaver extends ImgLayer {
 
-  Boolean   isCentered   = false;
-  Float     fadePerFrame = 0.90;
-  Point     raver        = new Point( width/2, height/2 );
+  Boolean   isCentered = false;
+  Point     raver      = new Point( width/2, height/2 );
   
   BigRaver() {
+    this.fadePerFrame = 0.90;
   }
   
   BigRaver( Boolean centered ) {
+    this.fadePerFrame = 0.90;
     isCentered = centered;
   }
 

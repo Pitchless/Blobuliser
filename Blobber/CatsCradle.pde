@@ -1,7 +1,6 @@
 class CatsCradle extends ImgLayer {
 
-  Boolean   isCentered   = false;
-  Float     fadePerFrame = 0.5;
+  Boolean isCentered   = false;
   
   CatsCradle() {
   }

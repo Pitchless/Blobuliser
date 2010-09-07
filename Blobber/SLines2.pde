@@ -9,12 +9,17 @@ class SLines2 extends ImgLayer {
 
   int direction = HORI;
   
+  SLines2() {
+    this.fadePerFrame = 0.9;
+  }
+  
   SLines2(int direction) {
     this.direction = direction;
+    this.fadePerFrame = 0.9;
   }
   
   void draw( Blob blobs[] ) {
-    fade(0.9);
+    fade();
     cycleColor();
     // shallow copy so we don't effact the order for other layers
     Blob sortedBlobs[] = (Blob[])blobs.clone();
