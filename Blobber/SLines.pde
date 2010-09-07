@@ -40,11 +40,11 @@ class SLines extends ImgLayer {
 
     img.beginDraw();
     if ((direction & HORI)==HORI) {
-      Arrays.sort(sortedBlobs, YSort);  // Yes, Horizontal is a y sort, think about it ;-)
+      Arrays.sort(sortedBlobs, BlobSort.Y);  // Yes, Horizontal is a y sort, think about it ;-)
       drawLines(sortedBlobs);
     }
     if ((direction & VERT)==VERT) {
-      Arrays.sort(sortedBlobs, XSort);
+      Arrays.sort(sortedBlobs, BlobSort.X);
       drawLines(sortedBlobs);
     }
     img.endDraw();

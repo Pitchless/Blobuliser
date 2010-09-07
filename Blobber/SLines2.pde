@@ -9,26 +9,6 @@ class SLines2 extends ImgLayer {
 
   int direction = HORI;
   
-  // Should be static but due to some Java inner class oddness it cant be
-  Comparator XSort = new Comparator() {
-      int compare(Object oa, Object ob) {
-        Point a = ((Blob)oa).centroid;
-        Point b = ((Blob)ob).centroid;
-        if (a.x == b.x) return 0;
-        return a.x < b.x ? -1 : 1;
-      }
-  };
-
-  // Should be static but due to some Java inner class oddness it cant be
-  Comparator YSort = new Comparator() {
-      int compare(Object oa, Object ob) {
-        Point a = ((Blob)oa).centroid;
-        Point b = ((Blob)ob).centroid;
-        if (a.y == b.y) return 0;
-        return a.y < b.y ? -1 : 1;
-      }
-  };
-  
   SLines2(int direction) {
     this.direction = direction;
   }
@@ -41,11 +21,11 @@ class SLines2 extends ImgLayer {
 
     img.beginDraw();
     if ((direction & HORI)==HORI) {
-        Blob splitBlobs[][] = splitSort(sortedBlobs, XSort, YSort);
+        Blob splitBlobs[][] = splitSort(sortedBlobs, BlobSort.X, BlobSort.Y);
         drawJoinedBlobs(splitBlobs[0], splitBlobs[1]);
     }
     if ((direction & VERT)==VERT) {
-      Blob splitBlobs[][] = splitSort(sortedBlobs, YSort, XSort);
+      Blob splitBlobs[][] = splitSort(sortedBlobs, BlobSort.Y, BlobSort.X);
       drawJoinedBlobs(splitBlobs[0], splitBlobs[1]);
     }
     img.endDraw();
@@ -54,7 +34,7 @@ class SLines2 extends ImgLayer {
 
   // Given an array of blobs, sorts that array and then splits into 2 halfs and sort those halfs.
   // Returns 2 element array containing the arrays for each half.
-  // e.g. Blob splitBlobs[][] = splitSort(blobs, XSort, YSort);
+  // e.g. Blob splitBlobs[][] = splitSort(blobs, BlobSort.X, BlobSort.Y);
   // Sort all the blobs based on x (left to right) then split (left side blobs and right side blobs),
   // then sort those blobs on y (top to bottom).
   Blob[][] splitSort(Blob blobs[], Comparator sort1, Comparator sort2) {
