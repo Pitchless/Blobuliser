@@ -84,9 +84,7 @@ void setup() {
     layers.add( new BlobTracker() );
     layers.add( new CrossHairs() );
     layers.add( new SLines2() );
-    layers.add( new SLines(SLines.HORI) );
-    layers.add( new SLines(SLines.VERT) );
-    layers.add( new SLines(SLines.HORI|SLines.VERT) );  // Both. Nice :)
+    layers.add( new SLines() );
     layers.add( new BigRaver(true, 0.986) );
     layers.add( new Shapes2(1,0.9999999) ); // square
     layers.add( new Shapes2(2,0.9999999) ); // circle
