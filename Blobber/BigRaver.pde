@@ -6,11 +6,12 @@ class BigRaver extends ImgLayer {
 
   Boolean   isCentered = false;
   Point     raver      = new Point( width/2, height/2 );
-  
-  BigRaver() {
-    this.fadePerFrame = 0.90;
-  }
-  
+
+  // Config for random constructor
+  float[] randFadePerFrame = { 0.2, 0.9, 0.986 };
+
+  BigRaver() { randomise(); }
+
   BigRaver( Boolean centered ) {
     this.fadePerFrame = 0.90;
     isCentered = centered;
@@ -21,6 +22,13 @@ class BigRaver extends ImgLayer {
     this.fadePerFrame = fade;
   }
   
+  void randomise() {
+    super.randomise();
+    this.fadePerFrame = randFadePerFrame[int(random(randFadePerFrame.length))];
+    this.isCentered = int(random(2)) == 0 ? true : false;
+    if (isCentered) raver = new Point( width/2, height/2 );
+  }
+
   void draw( Blob blobs[] ) {
     fade( fadePerFrame );
     cycleColor();

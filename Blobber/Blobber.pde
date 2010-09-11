@@ -85,7 +85,7 @@ void setup() {
     layers.add( new CrossHairs() );
     layers.add( new SLines2() );
     layers.add( new SLines() );
-    layers.add( new BigRaver(true, 0.986) );
+    layers.add( new BigRaver() );
     layers.add( new Shapes2(1,0.9999999) ); // square
     layers.add( new Shapes2(2,0.9999999) ); // circle
     layers.add( new Shapes2(1,0.998) );     // square
@@ -98,8 +98,6 @@ void setup() {
     layers.add( new Shapes(2,0.2) );        // circle
     layers.add( new CatsCradle() );
     layers.add( new NextManLines() );
-    layers.add( new BigRaver() );
-    layers.add( new BigRaver(true) );
     layers.show();
 
     // and the audio layers
