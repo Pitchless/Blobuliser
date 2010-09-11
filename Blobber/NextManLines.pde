@@ -1,9 +1,15 @@
 class NextManLines extends ImgLayer {
   
-  NextManLines() {
-    this.fadePerFrame = 0.8;
-  }
+  NextManLines() { randomise(); }
   
+  // Config for random constructor
+  float[] randFadePerFrame = { 0.4, 0.8, 0.94 };
+
+  void randomise() {
+    super.randomise();
+    this.fadePerFrame = randFadePerFrame[int(random(randFadePerFrame.length))];
+  }
+
   void draw( Blob blobs[] ) {
     fade();
     cycleColor();

@@ -1,9 +1,6 @@
 class CatsCradle extends ImgLayer {
-
-  Boolean isCentered   = false;
   
-  CatsCradle() {
-  }
+  CatsCradle() { randomise(); }
   
   void draw( Blob blobs[] ) { 
     img.beginDraw();
