@@ -1,0 +1,19 @@
+= History for Pitchless::Blobuliser =
+
+== Current ==
+
+    * Layer groups for building layer heirachys.
+    * GUI.
+    * New Effects
+        * CrossHairs
+        * SLines
+        * SLines2
+    * Removed solid filled shapes, bit tacky.
+    * Lazer line drawing.
+    * Blob sorting.
+    * Lots of code cleanup.
+
+
+== 2010-06-08 tag:Release-LondonTAA ==
+
+Version show at the London TAA 2010.
