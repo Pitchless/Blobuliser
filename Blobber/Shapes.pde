@@ -1,12 +1,13 @@
 class Shapes extends ImgLayer {
 
   int       drawShape    = 1; // 1=square 2=circle
-  Boolean   isCentered   = false;
-  float     fadePerFrame = 0.90;
   float     scaleRatio   = 0.7;
-  float     rotation     = 0;
 
-  Shapes() {}
+  // Config for random constructor
+  float[] randFadePerFrame = { 0.1, 0.9, 0.96 };
+  float[] randScaleRatio   = { 0.1, 0.2, 0.8, 0.9 };
+
+  Shapes() { randomise(); }
   
   Shapes( int drawShape ) {
     this.drawShape = drawShape;
@@ -19,6 +20,13 @@ class Shapes extends ImgLayer {
     this.fadePerFrame = 0.90;
   }
   
+  void randomise() {
+    super.randomise();
+    fadePerFrame = randFadePerFrame[int(random(randFadePerFrame.length))];
+    scaleRatio   = randScaleRatio[int(random(randScaleRatio.length))];
+    drawShape    = int(random(2))+1;
+  }
+
   void draw( Blob blobs[] ) {
     fade();
     cycleColor();

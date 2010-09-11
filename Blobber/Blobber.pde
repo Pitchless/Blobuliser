@@ -82,22 +82,14 @@ void setup() {
  
     // Create all the effect layers we will use   
     layers.add( new BlobTracker() );
+    layers.add( new Shapes() );
+    layers.add( new Shapes2() );
     layers.add( new CrossHairs() );
     layers.add( new SLines2() );
     layers.add( new SLines() );
     layers.add( new BigRaver() );
     layers.add( new CatsCradle() );
     layers.add( new NextManLines() );
-    layers.add( new Shapes2(1,0.9999999) ); // square
-    layers.add( new Shapes2(2,0.9999999) ); // circle
-    layers.add( new Shapes2(1,0.998) );     // square
-    layers.add( new Shapes2(2,0.996) );     // circle
-    layers.add( new Shapes2(1,0.68) );      // square
-    layers.add( new Shapes2(2,0.72) );      // circle
-    layers.add( new Shapes(1,0.9) );        // square
-    layers.add( new Shapes(2,0.8) );        // circle
-    layers.add( new Shapes(1,0.1) );        // square
-    layers.add( new Shapes(2,0.2) );        // circle
     layers.show();
 
     // and the audio layers

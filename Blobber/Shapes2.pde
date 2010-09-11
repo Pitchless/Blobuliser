@@ -7,9 +7,10 @@ class Shapes2 extends ImgLayer {
   int       weight       = 2;
   boolean   flipFlop     = true;
 
-  Shapes2() {
-    this.fadePerFrame = 0.9998;  
-  }
+  // Config for random constructor
+  float[] randFadePerFrame = { 0.68, 0.72, 0.76, 0.996, 0.9998, 0.9999999, 0.996, 0.9998, 0.9999999 };
+
+  Shapes2() { randomise(); }
   
   Shapes2( int drawShape ) {
     this.drawShape = drawShape;
@@ -20,11 +21,17 @@ class Shapes2 extends ImgLayer {
     this.drawShape    = drawShape;
     this.fadePerFrame = fadePerFrame;
   }
- 
+
+  void randomise() {
+    super.randomise();
+    fadePerFrame = randFadePerFrame[int(random(randFadePerFrame.length))];
+    drawShape    = int(random(2))+1;
+    size         = 5 + random(0,25);
+    weight       = (int)random(0,2) == 0 ? 1 : 2;
+  }
+
   void show() {
-    size = 5 + random(0,25);
     img.background(0,0,0,0);
-    weight = (int)random(0,2) == 0 ? 1 : 2;
     super.show();
   }
   
