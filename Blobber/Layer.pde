@@ -7,29 +7,39 @@ class Layer {
   String    name = "";
   color     fgcol = color(255,255,0);
   int       hCycle;
-  
+
   Layer() {
   }  
- 
+
   void show() {
     visible = true;
-    setRandomColor();
+    randomise();
   }
-  
+
   void hide() {
     visible = false;
   }
-  
+
   void toggleVisible() {
     if ( visible ) { hide(); } else { show(); }
   }
-  
+
   void setup() {
     name = this.getClass().getName();
     println( "Setup Layer: " + name );
+  }
+
+  /**
+   * Randomise the layers settings. Default rands the color. Sub classers should override to
+   * rand their settings as well.
+   */
+  void randomise() {
     setRandomColor();
   }
-  
+
+  /**
+   * Draw the layer. Sub classers need to impliment this to see anythin as default does nothing.
+   */
   void draw( Blob[] blobs ) {
   }
 

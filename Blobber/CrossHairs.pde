@@ -31,14 +31,9 @@ class CrossHairs extends ImgLayer {
   }
 
   void randomise() {
+    super.randomise();
     this.fadePerFrame = randFadePerFrame[int(random(randFadePerFrame.length))];
     this.direction    = int(random(3))+1;
-    setRandomColor();
-  }
-
-  void show() {
-    randomise();
-    super.show();
   }
 
   void draw( Blob blobs[] ) {

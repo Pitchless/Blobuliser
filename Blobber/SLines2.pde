@@ -8,16 +8,23 @@ class SLines2 extends ImgLayer {
   static final int VERT = 2;
 
   int direction = HORI;
-  
-  SLines2() {
-    this.fadePerFrame = 0.9;
-  }
-  
+
+  // Config for random constructor
+  float[] randFadePerFrame = { 0.4, 0.86, 0.988 };
+
+  SLines2() { randomise(); }
+
   SLines2(int direction) {
     this.direction = direction;
     this.fadePerFrame = 0.9;
   }
-  
+
+  void randomise() {
+    super.randomise();
+    this.fadePerFrame = randFadePerFrame[int(random(randFadePerFrame.length))];
+    this.direction    = int(random(3))+1;
+  }
+
   void draw( Blob blobs[] ) {
     fade();
     cycleColor();
