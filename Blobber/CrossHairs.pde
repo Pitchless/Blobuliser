@@ -12,9 +12,10 @@ class CrossHairs extends ImgLayer {
   // Drop line col alphs to this
   int transparency = 200;
 
-  CrossHairs() {
-    this.fadePerFrame = 0.86;
-  }
+  // Config for random constructor
+  float[] randFadePerFrame = { 0.4, 0.86, 0.988 };
+
+  CrossHairs() { randomise();  }
 
   CrossHairs(int direction) {
     this.direction = direction;
@@ -27,6 +28,17 @@ class CrossHairs extends ImgLayer {
   CrossHairs(int direction, float fadePerFrame) {
     this.direction = direction;
     this.fadePerFrame = fadePerFrame;
+  }
+
+  void randomise() {
+    this.fadePerFrame = randFadePerFrame[int(random(randFadePerFrame.length))];
+    this.direction    = int(random(3))+1;
+    setRandomColor();
+  }
+
+  void show() {
+    randomise();
+    super.show();
   }
 
   void draw( Blob blobs[] ) {

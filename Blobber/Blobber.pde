@@ -83,14 +83,6 @@ void setup() {
     // Create all the effect layers we will use   
     layers.add( new BlobTracker() );
     layers.add( new CrossHairs() );
-    layers.add( new CrossHairs(0.4) );
-    layers.add( new CrossHairs(0.988) );
-    layers.add( new CrossHairs(CrossHairs.HORI) );
-    layers.add( new CrossHairs(CrossHairs.HORI,0.4) );
-    layers.add( new CrossHairs(CrossHairs.HORI,0.988) );
-    layers.add( new CrossHairs(CrossHairs.VERT) );
-    layers.add( new CrossHairs(CrossHairs.VERT,0.4) );
-    layers.add( new CrossHairs(CrossHairs.VERT,0.988) );
     layers.add( new SLines2(SLines2.HORI) );
     layers.add( new SLines2(SLines2.VERT) );
     layers.add( new SLines2(SLines2.HORI|SLines2.VERT) ); // Both
