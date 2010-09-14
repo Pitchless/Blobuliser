@@ -90,6 +90,16 @@ void setup() {
     layers.add( new BigRaver() );
     layers.add( new CatsCradle() );
     layers.add( new NextManLines() );
+    // Double up layers so we get random combos of same layer and different
+    // randomlayering
+    layers.add( new Shapes() );
+    layers.add( new Shapes2() );
+    layers.add( new CrossHairs() );
+    layers.add( new SLines2() );
+    layers.add( new SLines() );
+    layers.add( new BigRaver() );
+    layers.add( new CatsCradle() );
+    layers.add( new NextManLines() );
     layers.show();
 
     // and the audio layers
