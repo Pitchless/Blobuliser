@@ -1,13 +1,10 @@
 /**
- * Detect blobs in a grid. Shows number of blobs in each section.
+ * Detect blobs in a grid. Shows number of blobs and total area in each section.
  */
 class Grid extends ImgLayer {
 
   int sizeX = 2;
   int sizeY = 2;
-  
-  // Config for random constructor
-  float[] randFadePerFrame = { 0.4, 0.86, 0.988 };
 
   Grid() { randomise(); }
 
@@ -16,15 +13,7 @@ class Grid extends ImgLayer {
     sizeY = y;
   }
 
-  void randomise() {
-    super.randomise();
-    this.fadePerFrame = randFadePerFrame[int(random(randFadePerFrame.length))];
-  }
-
-  void draw( Blob blobs[] ) {
-    //fade();
-    cycleColor();
-
+  GridSection[][] getGrid( Blob blobs[] ) {
     // Setup multi dimential array of grid sections
     int gridw = width/sizeX;    // Grid section width
     int gridh = height/sizeY;   // Grid section height
@@ -47,11 +36,16 @@ class Grid extends ImgLayer {
       grid[gridx][gridy].area+=blob.area;
     }
 
+    return grid;
+  }
+
+  void draw( Blob blobs[] ) {
+    GridSection grid[][] = getGrid(blobs);
+
     img.beginDraw();
     img.background(0,0,0,0); // Clear transparent
     for (int i=0; i<sizeX; i++) {
       for(int j=0; j<sizeY; j++) {
-        println(i + ", " + j + " count:" + grid[i][j]);
         GridSection sec = grid[i][j];
         img.fill(255);
         img.text( sec.count, sec.center.x, sec.center.y );
