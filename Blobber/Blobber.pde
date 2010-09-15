@@ -78,10 +78,11 @@ void setup() {
     lastUserImg = opencv.image();
        
     PFont font = loadFont( "AndaleMono.vlw" );
-    textFont( font );
+    textFont( font, 12 );
  
     // Create all the effect layers we will use   
     layers.add( new BlobTracker() );
+    layers.add( new Grid() );
     layers.add( new Shapes() );
     layers.add( new Shapes2() );
     layers.add( new CrossHairs() );
