@@ -47,11 +47,8 @@ class BigRaver extends ImgLayer {
          colorMode(RGB);
 
          img.strokeWeight(3);
-         img.stroke(linecol, 160);
-         img.line( raver.x, raver.y , blob1.x, blob1.y );
-         img.strokeWeight(1);
          img.stroke(linecol);
-         img.line( raver.x, raver.y , blob1.x, blob1.y );
+         lazerLine( raver.x, raver.y , blob1.x, blob1.y );
       }
       img.endDraw();
     }
