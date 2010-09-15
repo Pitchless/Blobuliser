@@ -82,7 +82,7 @@ void setup() {
  
     // Create all the effect layers we will use   
     layers.add( new BlobTracker() );
-    layers.add( new Grid() );
+    //layers.add( new Grid() );
     layers.add( new Shapes() );
     layers.add( new Shapes2() );
     layers.add( new CrossHairs() );
@@ -91,8 +91,7 @@ void setup() {
     layers.add( new BigRaver() );
     layers.add( new CatsCradle() );
     layers.add( new NextManLines() );
-    // Double up layers so we get random combos of same layer and different
-    // randomlayering
+    // Double up layers so we get random combos of same layer and different random layering
     layers.add( new Shapes() );
     layers.add( new Shapes2() );
     layers.add( new CrossHairs() );
