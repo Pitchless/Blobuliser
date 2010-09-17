@@ -17,6 +17,8 @@ boolean flipCam = true;
 // Use ps3 eye cam hack, read via processing and pass to opencv
 boolean ps3cam = true;
 
+boolean audioOn = true;
+
 // OpenCV blob detection settings
 int threshold = 60;
 int numBlobs = 16;
@@ -81,6 +83,7 @@ void setup() {
     textFont( font, 12 );
  
     // Create all the effect layers we will use   
+    println("Setting up layers");
     layers.add( new BlobTracker() );
     //layers.add( new Grid() );
     layers.add( new Shapes() );
@@ -102,20 +105,20 @@ void setup() {
     layers.add( new NextManLines() );
     layers.show();
 
-    // and the audio layers
-    audioLayers.add( new Noizer() );
-    audioLayers.add( new FModer() );
-    audioLayers.show();
-    gbGran = new BackgroundGranulation();
-    gbGran.setup();
-    
     // Setup all the crap we created above
-    println("Setting up layers");
     layers.setup();
     toggleRandomLayer();
-    audioLayers.setup();
     println("Setup " + layers.size() + " video layers");
-    println("Setup " + audioLayers.size() + " audio layers");
+
+    if (audioOn) { // Setup the audio layers
+      audioLayers.add( new Noizer() );
+      audioLayers.add( new FModer() );
+      audioLayers.show();
+      audioLayers.setup();
+      println("Setup " + audioLayers.size() + " audio layers");
+      gbGran = new BackgroundGranulation();
+      gbGran.setup();
+    }
     
     if ( ps3cam ) {
       capture = new Capture( this, width, height, 30 );
@@ -184,43 +187,46 @@ void draw() {
     else {
       background(0);
     }
- 
+
     if ( beRandom) {
-      // Dave's sound state changer
-      if(blobs.length < 5 && interactif == true){
-        timeSinceBlob ++;
-      }
-  
-      // check if we had no blobz, turn annoying noisez off and 
-      if(timeSinceBlob == delayForSound){
-        // turn off both interactive noises
-        audioLayers.hideAll();
-  
-        // turn on soundscape, set variable
-        gbGran.setSamples();
-        gbGran.show();
-        interactif = false;
-        println("Non - interactive mode!");
-        timeSinceBlob = 0;
+      if (audioOn) {
+        // Dave's sound state changer
+        if(blobs.length < 5 && interactif == true){
+          timeSinceBlob ++;
+        }
+
+        // check if we had no blobz, turn annoying noisez off and
+        if(timeSinceBlob == delayForSound){
+          // turn off both interactive noises
+          audioLayers.hideAll();
+
+          // turn on soundscape, set variable
+          gbGran.setSamples();
+          gbGran.show();
+          interactif = false;
+          println("Non - interactive mode!");
+          timeSinceBlob = 0;
+        }
+
+        if(blobs.length > 0 && interactif == false) {
+          // turn on both interactive noises
+          if ( soundFlipFlop ) {
+            audioLayers.get(0).show();
+            audioLayers.get(1).hide();
+          } else {
+            audioLayers.get(1).show();
+            audioLayers.get(0).hide();
+          }
+          soundFlipFlop = !soundFlipFlop;
+
+          // turn off soundscape, set variable
+          gbGran.hide();
+          interactif = true;
+          println("Interactive mode!");
+        }
       }
 
-      if(blobs.length > 0 && interactif == false) {
-        // turn on both interactive noises
-        if ( soundFlipFlop ) {
-          audioLayers.get(0).show();
-          audioLayers.get(1).hide();
-        } else {
-          audioLayers.get(1).show();
-          audioLayers.get(0).hide();
-        }
-        soundFlipFlop = !soundFlipFlop;
-  
-        // turn off soundscape, set variable
-        gbGran.hide();
-        interactif = true;
-        println("Interactive mode!");
-      }
-        
+      // Ranomise video layers
       frameChangeCounter++;
       if ( frameChangeCounter >= framesUntilChange ) {
         frameChangeCounter = 0;
@@ -232,8 +238,10 @@ void draw() {
  
     // Draw layers   
     layers.draw( blobs );
-    audioLayers.draw( blobs );    
-    gbGran.draw(blobs);
+    if (audioOn) {
+      audioLayers.draw( blobs );
+      gbGran.draw(blobs);
+    }
     
     if ( blurAmount > 0 ) {
       opencv.copy(this.get());
@@ -272,7 +280,7 @@ void toggleRandomLayer() {
 void setRandomLayers() {
   layers.hideAll();
   int numLayers = (int)random(1,3);
-  println("num layers" + numLayers);
+  //println("num layers" + numLayers);
   for ( int i=0; i<numLayers; i++) {
     layers.get(randomLayer()).show();
   }
